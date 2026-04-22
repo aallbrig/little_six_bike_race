@@ -1,0 +1,34 @@
+# Godot
+godot/LittleSix/.godot/
+godot/LittleSix/*.import
+godot/LittleSix/export_presets.cfg.bak
+
+# Build outputs
+dist/
+
+# Node.js
+node_modules/
+infra/lambda/**/node_modules/
+
+# Terraform state (should use remote backend)
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/.terraform/
+infra/terraform/plan.tfplan
+
+# Environment files
+.env
+*.env.local
+env.local.json
+
+# AWS credentials (never commit)
+.aws/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
