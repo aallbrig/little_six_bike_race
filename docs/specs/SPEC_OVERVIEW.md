@@ -24,6 +24,7 @@ Work through specs in this order. Each spec builds on previous ones. Do not star
 | 8 | [Audio System](spec_008_audio_system.md) | Spec 1 | Low |
 | 9 | [Player Progression & Persistence](spec_009_player_progression.md) | Spec 3, 4 | Medium |
 | 10 | [Race Physics & Simulation](spec_010_race_physics_simulation.md) | Spec 4 | High |
+| 11 | [Static Marketing Website & Game Host](spec_011_static_website.md) | Spec 1, 6 | Low |
 
 ---
 
@@ -43,6 +44,7 @@ Use this table to track implementation progress:
 | 008 — Audio System | Not started | |
 | 009 — Progression | Not started | |
 | 010 — Race Physics | Not started | |
+| 011 — Static Website | Not started | |
 
 ---
 
@@ -75,28 +77,40 @@ Acceptance criteria are written as testable pass/fail statements.
 4. **Performance:** Target 60 FPS on mid-range 2022 Android/iOS. No > 50 draw calls in race scene.
 5. **Godot 4.6 only:** Use Godot 4.x APIs. No Godot 3.x patterns (no `yield`, use `await`; no `connect()` with string, use lambdas or `Callable`).
 6. **Web export:** All code must be compatible with the Godot HTML5/WASM export target. No GDNative; no platform-specific filesystem paths except `user://`.
+7. **Compatibility renderer only:** Godot must be configured to use the **Compatibility** renderer (OpenGL ES 3.0 / WebGL 2.0). The `forward_plus` and `mobile` renderers are Vulkan-based and do not run in mobile phone web browsers — our primary target platform. See Spec 001 REQ-001-001.
+8. **Hosted inside a static website:** The game ships embedded in a small Bootstrap static site (Spec 011). The Godot game signals quit events to the host page via `postMessage`, and the host owns top-level navigation back to the home page.
 
 ---
 
 ## Architecture Diagram
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    GODOT AUTOLOADS                       │
-│                                                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐  │
-│  │EventBus  │  │SaveMgr   │  │    AudioManager      │  │
-│  │(signals) │  │(JSON I/O)│  │  (music/sfx)         │  │
-│  └────┬─────┘  └──────────┘  └──────────────────────┘  │
-│       │                                                  │
-│  ┌────▼─────────────────────────────────────────────┐   │
-│  │              GameManager (state machine)          │   │
-│  │  LOGO→CINEMATIC→TITLE→DEMO→HUB→TRAINING→RACE     │   │
-│  └────┬─────────────────────────────────────────────┘   │
-│       │                                                  │
-│  ┌────▼─────┐  ┌──────────────────────────────────┐    │
-│  │NetworkMgr│  │         Active Scene               │    │
-│  │(WSS peer)│  │  (Logo|Cinematic|Title|Race|etc.) │    │
-│  └──────────┘  └──────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│  STATIC WEBSITE (Bootstrap 5 — Spec 011)                      │
+│  ┌────────────────┐                   ┌────────────────────┐  │
+│  │  /  (home)     │  "Play Now" ───▶  │  /play  (host)     │  │
+│  │  trailer + CTA │                   │  full-screen canvas│  │
+│  └────────────────┘  ◀── navigate back on "quit" postMessage  │
+│                                              │                │
+│                                              │ embeds         │
+│                                              ▼                │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │     GODOT WEB EXPORT (Compatibility / WebGL 2.0)         │  │
+│  │                                                          │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────────┐ ┌────────┐   │  │
+│  │  │EventBus  │ │SaveMgr   │ │AudioManager  │ │HostBrdg│──▶│  │
+│  │  │(signals) │ │(JSON I/O)│ │(music/sfx)   │ │postMsg │   │  │
+│  │  └────┬─────┘ └──────────┘ └──────────────┘ └────────┘   │  │
+│  │       │                                                  │  │
+│  │  ┌────▼─────────────────────────────────────────────┐    │  │
+│  │  │           GameManager (state machine)             │    │  │
+│  │  │ LOGO→CINEMATIC→TITLE→DEMO→HUB→TRAINING→RACE→QUIT │    │  │
+│  │  └────┬─────────────────────────────────────────────┘    │  │
+│  │       │                                                  │  │
+│  │  ┌────▼─────┐  ┌──────────────────────────────────┐     │  │
+│  │  │NetworkMgr│  │         Active Scene               │   │  │
+│  │  │(WSS peer)│  │  (Logo|Cinematic|Title|Race|etc.) │   │  │
+│  │  └──────────┘  └──────────────────────────────────┘    │  │
+│  └─────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────┘
 ```

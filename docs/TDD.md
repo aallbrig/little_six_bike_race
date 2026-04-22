@@ -31,7 +31,7 @@
 |---|---|---|---|
 | Game Engine | Godot | 4.6 | Open-source; web export; GDScript simplicity |
 | Client Runtime | WebAssembly + JavaScript | ES2020 | Browser-native; no install |
-| Rendering (game) | Forward+ Mobile renderer | — | Balance of visual quality vs. mobile perf |
+| Rendering (game) | Compatibility renderer (OpenGL ES 3.0 / WebGL 2.0) | — | Required for mobile phone web browsers — Vulkan-based renderers (`forward_plus`, `mobile`) do not run on mobile browsers |
 | Scripting | GDScript | — | Native to Godot; fast iteration |
 | Game Server | Godot headless (Linux build) | 4.6 | Same codebase, authoritative simulation |
 | Matchmaking API | Node.js | 20 LTS | Lightweight; easy Lambda deployment |
@@ -801,7 +801,7 @@ When online, save is synced via REST API after each significant action:
 
 ### 12.1 Mobile Optimization Checklist
 
-- Use Mobile renderer (not Forward+)
+- Use the **Compatibility** renderer (`gl_compatibility`). The `mobile` and `forward_plus` renderers are Vulkan-based and do not run in mobile browsers. Compatibility runs on WebGL 2.0, which is supported by Safari iOS 15+ and Chrome Android 90+.
 - All textures: WebP format, power-of-2 dimensions
 - Crowd: GPU particles or 2D sprites on billboard, not full 3D
 - LOD: Riders at distance > 20m reduced to low-poly mesh

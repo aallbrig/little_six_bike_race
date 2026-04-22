@@ -150,6 +150,26 @@ Implement `TransitionManager` (Node, child of GameManager or separate autoload):
 - Transition overlay: full-screen `ColorRect` black with a circular mask shader
 - `GameManager.transition_to` always calls `transition_out` before loading new scene, then `transition_in` after scene is ready
 
+### REQ-002-009: Quit-to-Host Flow
+The Godot game runs embedded in a static web host (see Spec 011). "Quitting the game" does not mean closing the browser tab — it means handing control back to the host page, which then navigates to `/`.
+
+**User-facing entry points** (the player should always be able to reach at least one):
+- **Main Hub → Settings → "Exit Game"** button (secondary style). Opens the standard confirmation dialog (Spec 007 REQ-007-009) with copy: "Leave Little Six? Your progress is saved." Confirm transitions to `GameState.QUIT`.
+- **In-race pause menu → "Quit Race & Exit"** (destructive style; distinct from "Leave Race" which returns to Main Hub). Opens confirmation dialog.
+- **Any fatal error surface** (e.g., unrecoverable network error panel from Spec 007 REQ-007-010) may call `GameManager.quit_to_host("error")` directly.
+
+**Behavior when entering `GameState.QUIT`:**
+1. `GameManager._enter_state(QUIT)` stops all active audio (`AudioManager.stop_music(0.2)`), disconnects `NetworkManager` gracefully if connected, and flushes any pending `SaveManager.save_game()`.
+2. `HostBridge` (Spec 001 REQ-001-012) emits a `quit` host event with the supplied `reason`.
+3. The scene tree renders a final black `ColorRect` full-screen to avoid showing a paused canvas while the host page navigates.
+4. No further Godot state transitions occur. The host page takes over and navigates to `/` within ~150 ms.
+
+**Determinism:** `quit_to_host` MUST be idempotent. If the game is already in `QUIT`, subsequent calls do nothing.
+
+**Non-web builds:** In the editor or on a headless server build, `HostBridge` is a no-op (Spec 001 REQ-001-012). `GameState.QUIT` still runs its cleanup; for editor runs it may additionally call `get_tree().quit()` after 250 ms so developers can exit cleanly.
+
+The postMessage envelope, event types, and origin-validation rules are defined canonically in Spec 011 REQ-011-005 — do not re-specify them here.
+
 ---
 
 ## Data Structures
@@ -237,3 +257,8 @@ MainHub (Control)
 - [ ] All transitions use iris-wipe (circle mask opens/closes)
 - [ ] Music crossfades correctly between scenes (no hard cuts except bell lap)
 - [ ] MainHub shows correct player name and season progress after creation
+- [ ] Main Hub Settings screen shows an "Exit Game" button that opens a confirmation dialog and, on confirm, transitions to `GameState.QUIT`
+- [ ] In-race pause menu exposes "Quit Race & Exit" with a destructive confirmation dialog that transitions to `GameState.QUIT`
+- [ ] Entering `GameState.QUIT` calls `HostBridge.emit_to_host("quit", { reason: ... })` exactly once (idempotent across repeated calls)
+- [ ] Entering `GameState.QUIT` stops music, disconnects the network, flushes saves, and renders a black full-screen rect
+- [ ] When running as a Web export embedded in the Spec 011 host page, completing the Quit flow causes the host page URL to become `/` within 500 ms

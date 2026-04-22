@@ -28,6 +28,7 @@ The game simulates the full spirit of the Little 500: standardized coaster-brake
 | [Sound Design](docs/SOUND_DESIGN.md) | Audio direction and implementation guide |
 | [Level Design](docs/LEVEL_DESIGN.md) | Track layout, environment specs |
 | [Spec Overview](docs/specs/SPEC_OVERVIEW.md) | Index of all implementation specs |
+| [Future Ideas](docs/FUTURE_IDEAS.md) | Parked ideas not in current scope |
 
 ## Repository Structure
 
