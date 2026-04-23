@@ -1,0 +1,20 @@
+# LocalStack for local AWS testing
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=lambda,dynamodb,apigateway
+      - DEBUG=1
+      - LAMBDA_EXECUTOR=docker
+    volumes:
+      - "./localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock" 
+    networks:
+      - little-six-net
+
+networks:
+  little-six-net:
+    driver: bridge
+

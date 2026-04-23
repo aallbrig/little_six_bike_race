@@ -1,0 +1,12 @@
+{
+  "name": "little-six-matchmaking",
+  "version": "0.1.0",
+  "description": "LocalStack testing for Little Six matchmaking Lambda",
+  "scripts": {
+    "test": "echo \"LocalStack matchmaking test\"",
+    "deploy-local": "echo \"Deploying to LocalStack...\""
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1000.0"
+  }
+}

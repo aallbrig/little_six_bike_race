@@ -2,13 +2,17 @@ extends Node
 
 const SFX_CATALOG = {
     "sprint": "res://assets/audio/sfx/sprint.wav",
-    "crash": "res://assets/audio/sfx/crash.wav",
+    "crash": "res://assets/audio/sfx/crash.wav", 
     "exchange": "res://assets/audio/sfx/exchange.wav",
     "bell_lap": "res://assets/audio/sfx/bell_lap.wav",
     "victory": "res://assets/audio/sfx/victory.wav",
     "defeat": "res://assets/audio/sfx/defeat.wav",
     "ui_click": "res://assets/audio/sfx/ui_click.wav",
     "ui_hover": "res://assets/audio/sfx/ui_hover.wav",
+    "fatigue_warning": "res://assets/audio/sfx/fatigue_warning.wav",
+    "burn": "res://assets/audio/sfx/burn.wav",
+    "drafting": "res://assets/audio/sfx/drafting.wav",
+    "pit_zone": "res://assets/audio/sfx/pit_zone.wav",
 }
 
 var _music_a: AudioStreamPlayer
@@ -40,10 +44,10 @@ func play_music(track_id: String, fade_time: float = 1.0) -> void:
     var track_path = "res://assets/audio/music/" + track_id + ".ogg"
     var stream = load(track_path)
     if not stream:
-        push_error("Music track not found: " + track_path)
+        # Silent fallback for missing assets during development
         return
 
-    # Crossfade between music players
+    # Crossfade between music layers A/B
     var active_player = _music_a if _music_a.playing else _music_b
     var inactive_player = _music_b if active_player == _music_a else _music_a
 
@@ -52,8 +56,11 @@ func play_music(track_id: String, fade_time: float = 1.0) -> void:
     inactive_player.play()
 
     if active_player.playing:
-        # TODO: Implement crossfade tween
-        active_player.stop()
+        # Simple crossfade using tween
+        var tween = create_tween()
+        tween.tween_property(active_player, "volume_db", linear_to_db(0.0), fade_time)
+        tween.tween_callback(active_player.stop)
+        tween.tween_property(inactive_player, "volume_db", linear_to_db(_music_volume), fade_time)
 
 func stop_music(fade_time: float = 0.5) -> void:
     _music_a.stop()
