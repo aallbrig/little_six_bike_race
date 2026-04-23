@@ -240,6 +240,85 @@ At the end of each season (main race complete):
    - Season-specific data (qualifying time, spring series results) resets
 3. Option: "VIEW SEASON RECORD" (view-only mode for completed season)
 
+### REQ-009-010: Season Calendar (data-driven)
+Little Six runs **four seasons per calendar year**, rotating continuously. Only the **Spring Series** is anchored to the real IU Little 500 schedule; the other three are anchored to calendar quarters. The product rationale lives in [ADR 0001](../adr/0001-schedule-alignment-with-little-500.md); this requirement encodes it as data so that the UI and matchmaking can render the correct season without hard-coded dates.
+
+**Data location:** `res://data/season_calendar.json`, loaded on startup by a new `SeasonCalendar` helper (plain GDScript class, not an autoload). The file is plain JSON so an ops task can update it each year.
+
+**Schema:**
+
+```json
+{
+  "seasons": [
+    {
+      "id": "spring_2026",
+      "label": "Spring Series 2026",
+      "kind": "spring_series",
+      "aligned_to_little_500": true,
+      "little_500_year": 2026,
+      "quals_date": "2026-03-21",
+      "race_weekend": { "womens": "2026-04-17", "mens": "2026-04-18" },
+      "window_start": "2026-01-01",
+      "window_end": "2026-04-18"
+    },
+    {
+      "id": "summer_2026",
+      "label": "Summer Circuit 2026",
+      "kind": "summer_circuit",
+      "aligned_to_little_500": false,
+      "window_start": "2026-04-19",
+      "window_end": "2026-06-30"
+    },
+    {
+      "id": "autumn_2026",
+      "label": "Autumn Invitational 2026",
+      "kind": "autumn_invitational",
+      "aligned_to_little_500": false,
+      "window_start": "2026-07-01",
+      "window_end": "2026-09-30"
+    },
+    {
+      "id": "winter_2026",
+      "label": "Winter Trials 2026",
+      "kind": "winter_trials",
+      "aligned_to_little_500": false,
+      "window_start": "2026-10-01",
+      "window_end": "2026-12-31"
+    }
+  ]
+}
+```
+
+**Derivation rule (Spring Series dates):** For any year `Y`, once IU publishes that year's Little 500 dates, Spring Series dates are computed as:
+
+```
+spring_series.quals_date      = iu_little_500.quals_date      - 7 days
+spring_series.race_weekend.*  = iu_little_500.race_weekend.*  - 7 days
+spring_series.window_end      = spring_series.race_weekend.mens (or combined race day)
+```
+
+This is a one-time ops task per year (update the JSON); no runtime computation against external APIs.
+
+**`SeasonCalendar` interface:**
+
+```gdscript
+class_name SeasonCalendar
+
+static func load() -> Array[Dictionary]          # Reads season_calendar.json
+static func current(now: String = "") -> Dictionary  # Season whose window contains `now` (defaults to today)
+static func next_of_kind(kind: String, now: String = "") -> Dictionary
+static func days_until_race_weekend(season: Dictionary, now: String = "") -> int
+```
+
+All date arithmetic uses ISO 8601 strings and the `Time` singleton. Time zone is fixed to America/Indiana/Indianapolis for Spring Series; other seasons are timezone-naive (calendar-quarter boundaries).
+
+**Main Hub integration:** The Season action card on `MainHub.tscn` (Spec 002 REQ-002-007) displays:
+- The current season label (`SeasonCalendar.current().label`).
+- Days until that season's Race Weekend.
+- For Spring Series specifically, an additional line: *"Real Little 500: <date>"* — making the one-week offset explicit to the player.
+
+**Ops annual checklist:** Add a runbook entry "When IUSF publishes next year's Little 500 dates, update `season_calendar.json` Spring Series anchors (`iu_dates - 7 days`) and file a deploy." This is also noted in [ADR 0001](../adr/0001-schedule-alignment-with-little-500.md) follow-ups.
+
 ---
 
 ## Signal Interface
@@ -277,3 +356,8 @@ EventBus.training_day_completed → award training CP
 - [ ] New season: SeasonData resets but stats/ELO/CP carry over
 - [ ] Server sync fires after race complete (verify with network log)
 - [ ] Daily bonus awards 15 CP on first race of new day
+- [ ] `res://data/season_calendar.json` is present and parses successfully on startup
+- [ ] `SeasonCalendar.current()` returns the correct season for at least one known date in each of the four quarterly windows
+- [ ] Spring Series dates in the bundled calendar match `IU Little 500 dates − 7 days` for the current year
+- [ ] Main Hub Season card renders the current season label and the correct days-until-Race-Weekend value
+- [ ] Main Hub Season card, while Spring Series is active, also shows the real IU Little 500 date

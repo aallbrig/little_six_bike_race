@@ -20,6 +20,8 @@ The game simulates the full spirit of the Little 500: standardized coaster-brake
 
 | Document | Description |
 |---|---|
+| [Audience & Personas](docs/AUDIENCE.md) | Who we are (and aren't) building for |
+| [ADRs](docs/adr/README.md) | Architecture Decision Records |
 | [Game Design Document](docs/GDD.md) | Full game design: mechanics, systems, flow |
 | [Technical Design Document](docs/TDD.md) | Engine architecture, code organization, data models |
 | [Art Bible](docs/ART_BIBLE.md) | Visual direction, style guide, asset specs |

@@ -258,7 +258,7 @@ Displayed as latency indicator in lobby and top-right during race.
 WAITING     → READY  (all players confirmed ready, or 15s timeout auto-fills with AI)
 READY       → COUNTING (server starts 3-2-1 countdown)
 COUNTING    → RACING (race begins)
-RACING      → FINISHED (all 50 laps completed)
+RACING      → FINISHED (all 600 laps completed)
 FINISHED    → CLEANUP (results sent, room destroyed after 30s)
 
 If any state times out:

@@ -34,19 +34,23 @@
 | **Genre** | Multiplayer Arcade Racing / Social Simulation |
 | **Platform** | Web browser (mobile-first; desktop supported) |
 | **Engine** | Godot 4.6 |
-| **Target Audience** | Ages 16–30; college students, cycling fans, casual gamers |
+| **Target Audience** | See [AUDIENCE.md](AUDIENCE.md). Primary: real Little 500 riders. Secondary: Little 500 fans, mobile arcade gamers, Tamagotchi enjoyers. |
 | **Players** | 1–6 concurrent (one race room) |
-| **Session Length** | 5–20 minutes per race; 2–5 minutes training per day |
+| **Session Length** | 15–20 minutes per race; 2–5 minutes training per day |
 
 ### High-Concept Pitch
 
-> *Train your rider like a Tamagotchi. Race 50 laps around the cinder oval. Execute "the burn" in the pit. Be the last team standing when the bell lap drops.*
+> *Train your rider like a Tamagotchi. Race 600 laps around the cinder oval. Execute "the burn" in the pit. Be the last team standing when the bell lap drops.*
 
 Little Six is a two-layer game: a **daily training simulator** where the player nurtures their racer's stats through careful choices (without over-training!), and a **real-time multiplayer race** where those investments pay off. The game compresses a full collegiate cycling season into tight, phone-friendly play sessions.
 
+### Setting
+
+Little Six is set at a **fictional all-American college** — working name **"Little Six University"**, home of the annual 600-lap Little Six bike race. The fiction is deliberately archetypal: a cinder oval, a grandstand, dorms and Greek houses, a cycling culture that treats Race Weekend as the year's emotional anchor. It is a spiritual successor to — not an impersonation of — Indiana University's Little 500 tradition. See [ADR 0001](adr/0001-schedule-alignment-with-little-500.md) for the naming / scheduling rationale.
+
 ### Inspiration
 
-- **Primary:** Indiana University's Little 500 bike race (est. 1951)
+- **Primary:** Indiana University's Little 500 bike race (est. 1951). Little Six's flagship season is deliberately scheduled **one week before** the real Little 500 race weekend so the game hypes our core audience (current/former IU riders) *into* the real event rather than competing with it. See [ADR 0001](adr/0001-schedule-alignment-with-little-500.md).
 - **Training Loop:** Tamagotchi, Pokémon training mechanics
 - **Racing:** Mario Kart (arcade feel), Sprint (Midway arcade)
 - **Aesthetic:** Americana college town, late-spring golden hour
@@ -63,8 +67,8 @@ Every mechanic traces back to a real Little 500 rule or cultural element. Coaste
 **2. Mobile-First, Frictionless**  
 Every screen is designed for a 390×844 px phone. One thumb should handle 80% of training interactions. Racing uses simple two-thumb controls. No required keyboard or mouse.
 
-**3. Short Sessions, Long Engagement**  
-Each play session is 5–20 minutes. But the season loop — training for 6 weeks then racing — provides weeks of engagement. Players dip in daily to train, then gather for race events.
+**3. Short Sessions, Long Engagement**
+Each play session is 5–20 minutes. The flagship race itself runs 15–20 minutes (600 laps at ~1.5–2 seconds per lap in game time). The season loop — train daily, race weekly, culminate in a Race Weekend finale — provides months of engagement. Four quarterly seasons per year means the loop never goes cold; the Spring Series is the canonical one (aligned to the real Little 500), and the other three seasons fill the calendar. See [ADR 0001](adr/0001-schedule-alignment-with-little-500.md) and §6.1 below.
 
 **4. Event-Driven Architecture**  
 Every significant action emits an event. No system polls for state; everything reacts to signals. This keeps the code decoupled and easy to extend.
@@ -172,42 +176,79 @@ ONBOARDING / MAIN HUB
 
 ### 4.2 Racer Backgrounds
 
-| Background | Speed | Endurance | Recovery | Handling | TeamChem | Flavor |
-|---|---|---|---|---|---|---|
-| Weekend Warrior | 45 | 50 | 55 | 50 | 60 | "You ride for fun on weekends. Balanced and friendly." |
-| Ex-Track Star | 70 | 40 | 45 | 65 | 40 | "Fast but brittle. High ceiling if you manage fatigue." |
-| Distance Rider | 35 | 75 | 60 | 45 | 50 | "Built for the long haul. Steady wins the race." |
-| Complete Newbie | 30 | 35 | 65 | 35 | 70 | "Most room to grow. Training pays off faster." |
+Stats below use the four-button-era schema (see §5). All starter racers get a small pool of randomized points distributed across the six stats so no two Weekend Warriors are identical.
+
+| Background | Power | Cadence | Endurance | Recovery | Handling | Race IQ | Flavor |
+|---|---|---|---|---|---|---|---|
+| Weekend Warrior | 45 | 55 | 50 | 55 | 50 | 55 | "You ride for fun on weekends. Balanced and friendly." |
+| Ex-Track Star | 70 | 60 | 40 | 45 | 65 | 35 | "Fast but brittle. High ceiling if you manage fatigue." |
+| Distance Rider | 35 | 55 | 75 | 60 | 45 | 45 | "Built for the long haul. Steady wins the race." |
+| Complete Newbie | 30 | 35 | 35 | 65 | 35 | 40 | "Most room to grow. Training pays off faster." |
 
 ---
 
 ## 5. Racer Creation & Stats
 
+> **Status: proposal.** This stats framework is a first draft tied to the four-button pedal + steer control scheme in [ADR 0003](adr/0003-input-control-scheme.md). The names, ranges, and effect formulas are expected to evolve as we playtest; treat specific numbers as load-bearing for implementation but negotiable for tuning. The *shape* (skill-ceiling + skill-forgiveness stats, plus transient state) is the part we commit to.
+
+### Design principle
+
+Stats never substitute for skill. In the four-button scheme, the player physically produces pedal rhythm and steering. Stats determine two things only:
+
+1. **Ceiling** — how much power a perfect input produces.
+2. **Forgiveness** — how wide the "good-enough" window is around ideal input.
+
+A maxed-out racer with a sloppy rider will still lose to a disciplined rider on a mid-stat racer. Equally-skilled riders, however, will see their stats decide the race.
+
 ### 5.1 Permanent Stats (0–100 scale)
 
-| Stat | Effect in Race | Effect in Training |
-|---|---|---|
-| **Speed** | Top sprint velocity; "burn" effectiveness | Determines max training load before diminishing returns |
-| **Endurance** | Laps before fatigue penalty kicks in; sustain speed in pack | Training sessions scale based on base endurance |
-| **Recovery** | How fast fatigue drops between exchanges | Reduces rest-day requirement; faster bounce-back |
-| **Handling** | Corner speed (turn 1 & 2); pack avoidance; exchange precision | Affects "Video Study" training yield |
-| **TeamChem** | Speed bonus when within 2 bike-lengths of a teammate | Improves with Team Meeting training |
+| Stat | What it does in race | Primary skill it modifies | How it's trained |
+|---|---|---|---|
+| **Power** | Force per pedal stroke ("ceiling"). Directly scales the top speed achievable by a perfectly-timed cadence. | Ceiling of **Pedal L / Pedal R**. | Sprint Intervals, Strength Work. |
+| **Cadence** | Width of the power-stroke timing window ("forgiveness"). Higher Cadence = more of your imperfect strokes still deliver power. | Forgiveness of **Pedal L / Pedal R**. | Video Study (rhythm drills), Long Ride. |
+| **Endurance** | How long before the power-stroke window narrows under race fatigue. Low Endurance → Cadence effectively drops mid-race. | Both ceiling and forgiveness over time. | Long Ride, Nutrition Plan. |
+| **Recovery** | Rate of fatigue bleed-off while coasting or drafting. High Recovery makes draft-resting viable as a tactic. | Restores Cadence/Power window between efforts. | Recovery Spin, Rest Day. |
+| **Handling** | Corner grip (max corner speed without crashing) and steering responsiveness (lag between button press and bike rotation). | Ceiling and responsiveness of **Steer L / Steer R**. | Video Study, Strength Work. |
+| **Race IQ** | Passive bonuses: drafting efficiency (extra speed in a draft), optimal-line assist (auto-corrects tiny steering errors on straights), exchange precision (Phase 2). Also the stat that **Season Momentum** (see §5.3) most directly amplifies. | Amplifies everything modestly. | Team Meeting, Video Study, participation in **weekly races** (see [ADR 0002](adr/0002-weekly-race-format-and-leagues.md) / [Spec 012](specs/spec_012_weekly_races_and_leaderboards.md)). |
 
-### 5.2 Transient Stats (reset between races/seasons)
+**Renames from the prior model:** `Speed → Power`; `TeamChem → Race IQ`. Endurance, Recovery, Handling are unchanged by name; their effect formulas are re-grounded against the four-button scheme.
+**New stat:** **Cadence** — the heart of the skill-vs-training bargain. Without Cadence, the timing window is narrow enough that only elite rhythm players win; with maxed Cadence, forgiving enough that a casual player can finish respectably.
+
+### 5.2 Effect Formulas (first-cut, tunable)
+
+```
+power_window_width_ms   = 60 + (Cadence * 1.4)        // 60–200 ms window at 0→100
+power_per_stroke_watts  = 120 + (Power * 3.8)         // 120–500 W ceiling
+fatigue_drain_per_sec   = 3.0 - (Endurance / 50.0)    // 3.0 → 1.0/s at 0→100
+fatigue_recovery_per_sec = 0.8 + (Recovery / 25.0)    // 0.8 → 4.8/s at 0→100 while coasting/drafting
+max_corner_speed_factor = 0.55 + (Handling / 250.0)   // 55% → 95% of straight speed
+draft_efficiency_bonus  = 0.08 + (Race IQ / 500.0)    // 8% → 28% speed bonus in draft
+```
+
+All formulas are first-cut values. A balancing pass during internal playtests is expected.
+
+### 5.3 Transient Stats (reset between races/seasons)
 
 | Stat | Range | Description |
 |---|---|---|
-| **Fatigue** | 0–100 | Accumulates from training. High fatigue penalizes all race performance. Resets fully at race day. |
-| **Morale** | 0–100 | Improves race performance across the board. Starts at 50. |
-| **Race Form** | 0–100 | Hidden stat. Combination of recent training consistency and rest. Shown as "HOT / WARM / COLD" indicator. |
+| **Fatigue** | 0–100 | Rises from training and from in-race effort. High fatigue narrows the Cadence window and reduces training gains. Resets fully on race day. |
+| **Morale** | 0–100 | Small multiplier on all race performance. Starts at 50. |
+| **Race Form** | 0–100 | Hidden stat; surfaced as "HOT / WARM / COLD." Combination of recent training consistency, rest balance, and weekly-race results. |
+| **Season Momentum** | 0–10 | Granted by weekly race participation; decays if you skip weekly races. Directly widens the Cadence power window and amplifies draft efficiency. See [Spec 012 REQ-012-011](specs/spec_012_weekly_races_and_leaderboards.md). |
 
-### 5.3 Stat Caps and Soft Caps
+### 5.4 Stat Caps and Soft Caps
 
-- Hard cap: 100 for all stats
-- Soft cap at 85: training gains above 85 are halved
-- Diminishing returns above 90: gains quartered
-- Fatigue above 70: all training gains reduced 30%
-- Fatigue above 85: risk of **injury event** each training session (15% chance)
+- Hard cap: **100** for all permanent stats; **10** for Season Momentum.
+- Soft cap at 85: training gains above 85 are halved.
+- Diminishing returns above 90: gains quartered.
+- Fatigue above 70: all training gains reduced 30%.
+- Fatigue above 85: risk of **injury event** each training session (15% chance).
+
+### 5.5 Why these stats and not others
+
+- **Why no generic "Speed."** "Speed" in the prior model implied auto-accelerate. Under the four-button scheme, speed is an *emergent outcome* of Power × Cadence × timing, not a top-line stat. Surfacing it separately would mislead players about what to train.
+- **Why Race IQ exists as a stat and not just "elo."** ELO measures outcomes across players; Race IQ measures the racer's in-engine behavior (draft quality, line assist). They're orthogonal: a skilled player can have high ELO on a low-Race IQ racer, and a weak player can ride a high-Race IQ racer to respectable finishes on the back of better drafting alone.
+- **Why Momentum is a transient stat, not a cosmetic streak counter.** It has to *move the race*. A streak counter that only appears on a profile card doesn't incentivize the weekly loop ([ADR 0002](adr/0002-weekly-race-format-and-leagues.md)). Making it a live Cadence-window widener keeps the "drop-in, but it matters" bargain.
 
 ### 5.4 Injury System
 
@@ -223,10 +264,21 @@ When injured:
 
 ### 6.1 Season Structure
 
-A full season consists of:
-- **6 Training Weeks** (before the final race)
-- Each week: **3 Training Days** + **1 Spring Series Event**
-- Final week: Qualifying + Main Race
+Little Six runs **four seasons per year**, one per calendar quarter. Only the **Spring Series** is tied to the real IU Little 500 calendar; the other three ("Summer Circuit," "Autumn Invitational," "Winter Trials") are wholly fictional and keep the Tamagotchi loop alive year-round. Full reasoning in [ADR 0001](adr/0001-schedule-alignment-with-little-500.md).
+
+| Season | Calendar window | Fictional theme | Real-world alignment |
+|---|---|---|---|
+| **Spring Series** | Jan 1 → IU Race Weekend − 1 week | Canonical: Qualifications, ITT, Miss-N-Out, Team Pursuit, Race Weekend. | **Aligned.** Little Six Quals are **one week before** IU Quals; Little Six Race Weekend is **one week before** the real Little 500. |
+| **Summer Circuit** | ≈ mid-Apr → Jun 30 | Off-season criterium series at fictional venues. Shorter, sprint-heavy meta. | Off-cycle. |
+| **Autumn Invitational** | Jul 1 → Sep 30 | Invitational cup at fictional rival campuses. | Off-cycle. |
+| **Winter Trials** | Oct 1 → Dec 31 | Indoor/time-trial emphasis; "preseason" for the coming Spring. | Off-cycle; leads into next Spring Series. |
+
+Within every season, the training cadence is:
+- **~6 Training Weeks** leading to the season finale
+- Each week: **3 Training Days** + **1 Series Event**
+- Final week: **Qualifying + Race Weekend**
+
+Spring Series example (2026 canonical — anchors recomputed yearly from IU's published dates):
 
 ```
 Week 1: [Train][Train][Train][ITT Event]
@@ -234,9 +286,12 @@ Week 2: [Train][Train][Train][Miss-N-Out Event]
 Week 3: [Train][Train][Train][Team Pursuit Event]
 Week 4: [Train][Train][Train][ITT Event (ranked)]
 Week 5: [Train][Train][Train][Miss-N-Out (ranked)]
-Week 6: [Train][Train][Train][Qualifying Time Trial]
-Race Week: [Qualifying][Qualifying][RACE DAY]
+Week 6: [Train][Train][Train][Qualifying Time Trial]  ← Little Six Quals: Sat 2026-03-21
+Race Week: [Qualifying][Qualifying][RACE DAY]        ← Little Six Race Weekend: Fri–Sat 2026-04-17/18
+                                                       (one week before the real IU Little 500 on Fri–Sat 2026-04-24/25)
 ```
+
+The Tamagotchi care loop (fatigue, morale, race form) **persists across season boundaries** — a racer dropped between seasons loses condition, exactly as they would in the real sport. This gives the game a reason to exist on a random Tuesday in August.
 
 ### 6.2 Training Day
 
@@ -252,16 +307,18 @@ After selection:
 
 ### 6.3 Training Activities
 
-| Activity | Speed Δ | Endurance Δ | Recovery Δ | Handling Δ | TeamChem Δ | Fatigue Δ | Morale Δ |
-|---|---|---|---|---|---|---|---|
-| Sprint Intervals | +3 | 0 | 0 | 0 | 0 | +4 | +1 |
-| Long Ride | 0 | +4 | 0 | +1 | 0 | +3 | +1 |
-| Recovery Spin | 0 | 0 | +3 | 0 | 0 | -4 | +2 |
-| Rest Day | 0 | 0 | +1 | 0 | 0 | -7 | +3 |
-| Strength Work | +2 | +2 | 0 | 0 | 0 | +5 | 0 |
-| Video Study | 0 | 0 | 0 | +4 | 0 | 0 | +1 |
-| Team Meeting | 0 | 0 | 0 | 0 | +5 | 0 | +4 |
-| Nutrition Plan | 0 | +2 | +1 | 0 | 0 | -3 | +1 |
+Columns below use the four-button-era stats (§5). Cadence is trained by rhythm-focused activities (Video Study drills, Long Ride). Race IQ is trained by Team Meeting and by **participating in weekly races** (see [ADR 0002](adr/0002-weekly-race-format-and-leagues.md)).
+
+| Activity | Power Δ | Cadence Δ | Endurance Δ | Recovery Δ | Handling Δ | Race IQ Δ | Fatigue Δ | Morale Δ |
+|---|---|---|---|---|---|---|---|---|
+| Sprint Intervals | +3 | +1 | 0 | 0 | 0 | 0 | +4 | +1 |
+| Long Ride | 0 | +2 | +4 | 0 | +1 | 0 | +3 | +1 |
+| Recovery Spin | 0 | 0 | 0 | +3 | 0 | 0 | -4 | +2 |
+| Rest Day | 0 | 0 | 0 | +1 | 0 | 0 | -7 | +3 |
+| Strength Work | +2 | 0 | +2 | 0 | +1 | 0 | +5 | 0 |
+| Video Study | 0 | +3 | 0 | 0 | +2 | +1 | 0 | +1 |
+| Team Meeting | 0 | 0 | 0 | 0 | 0 | +5 | 0 | +4 |
+| Nutrition Plan | 0 | 0 | +2 | +1 | 0 | 0 | -3 | +1 |
 
 **Rules:**
 - "Rest Day" cannot be combined with any other activity (it consumes both slots)
@@ -275,8 +332,8 @@ Probability: 25% chance per training day. One event fires after both activities 
 | Event | Trigger Weight | Effect | Flavor Text |
 |---|---|---|---|
 | Breakthrough Session | Fatigue < 50, Week ≥ 3 | +5 to highest trained stat | *"Something clicked today. You feel unstoppable."* |
-| Minor Strain | Fatigue > 60 | +3 Fatigue, -1 Speed | *"Pushed a little too hard. Your legs are talking to you."* |
-| Rival Encounter | Any | +2 Speed, +3 Morale | *"You traded pace lines with a top-ranked team. Motivating."* |
+| Minor Strain | Fatigue > 60 | +3 Fatigue, -1 Power | *"Pushed a little too hard. Your legs are talking to you."* |
+| Rival Encounter | Any | +2 Power, +3 Morale | *"You traded pace lines with a top-ranked team. Motivating."* |
 | Rain Day | Weeks 1–4 | Only indoor options available today | *"A spring storm rolls through. Adapt or rest."* |
 | Equipment Check | Any | 0 effect, but miss 1 activity slot | *"The pit crew flagged an issue. Lost a training slot but avoided a race problem."* |
 | Coach's Pep Talk | Morale < 40 | +10 Morale | *"Your coach pulls you aside. 'Believe in the process.'"* |
@@ -345,7 +402,9 @@ Spring Series events occur once per week. They serve two purposes:
 
 ### 8.1 Overview
 
-The Little Six main race is a 50-lap relay race on a quarter-mile cinder oval. Up to 6 teams of up to 4 riders compete. Only one rider per team is on the track at any time; teammates wait at the team's pit spot and can exchange on any lap.
+The Little Six main race is a **600-lap** relay race on a quarter-mile cinder oval at Little Six University's home stadium. Up to 6 teams of up to 4 riders compete. Only one rider per team is on the track at any time; teammates wait at the team's pit spot and can exchange on any lap.
+
+The 600-lap figure is deliberate fiction — a spiritual-successor bump from the real Little 500's "500" headline — not a simulation of the real race's 200-lap (men's) / 100-lap (women's) format. In-game lap pacing averages **~1.5–2.0 seconds per lap** of wall-clock time, so a full race fits in a **15–20 minute** mobile play session. See [ADR 0001](adr/0001-schedule-alignment-with-little-500.md) for the rationale.
 
 ### 8.2 Track Layout
 
@@ -372,8 +431,8 @@ In Phase 1, each player controls their single racer for the full race duration. 
 - 6 players per race room
 - Each player rides their trained racer
 - Racer stats affect in-race performance
-- 50 laps to complete
-- Winner: first to complete lap 50
+- 600 laps to complete (15–20 minute target run-time)
+- Winner: first to complete lap 600
 
 ### 8.4 Race Phase (Full — Team Relay, Phase 2)
 
@@ -383,7 +442,7 @@ In Phase 2, teams of 2–4 riders compete as a unit:
 - Only the "active" rider is on track
 - Others wait at pit spot
 - Exchange: active rider rides into the 16-foot exchange zone; tap the Exchange button; the next rider takes over (instant, simulated handoff)
-- **Minimum exchanges:** 5 exchanges required; penalty lap added if not met by lap 40
+- **Minimum exchanges:** 5 exchanges required; penalty lap added if not met by lap 500 (with ~100 laps of cushion before the finale)
 - **The Burn:** If the player presses Sprint + Exchange simultaneously in the exchange zone, the exchange is faster (0.3s advantage) and the outgoing rider visually sprints and brakes hard
 
 ### 8.5 Race Mechanics
@@ -418,15 +477,15 @@ In Phase 2, teams of 2–4 riders compete as a unit:
 - Cannot crash in straight sections unless colliding directly with another rider
 
 **Bell Lap**
-- Lap 50 is the bell lap
+- Lap 600 is the bell lap (rung as the leader crosses the line starting lap 600)
 - Audio: bell rings, crowd noise increases dramatically
-- All sprint bars fully refill for lap 50 (the "final sprint")
+- All sprint bars fully refill for the final lap
 - All drafting effects are removed (pure speed contest)
 
 ### 8.6 Race HUD
 
 On mobile (landscape orientation):
-- Top-left: Lap counter (CURRENT / 50) + position badge (e.g., "3rd")
+- Top-left: Lap counter (CURRENT / 600) + position badge (e.g., "3rd")
 - Top-center: Minimap (oval; team dots colored)
 - Top-right: Sprint bar (vertical gauge)
 - Bottom-left: Fatigue indicator (colored arc: green → yellow → red)
@@ -589,9 +648,11 @@ ATTRACT MODE (passive)
 
 ### 12.2 Seasons
 
-- A season is 7 weeks (6 training + race week)
-- Seasons reset globally on a schedule (or when the player completes their current season)
-- Career stats accumulate across seasons
+- The calendar year runs as **four quarterly seasons**: Spring Series, Summer Circuit, Autumn Invitational, Winter Trials (see §6.1 and [ADR 0001](adr/0001-schedule-alignment-with-little-500.md)).
+- A season is ~7 weeks of active training + events, culminating in a Race Weekend.
+- **Spring Series is globally anchored** to the real IU Little 500 schedule (`Little Six dates = IU dates − 7 days`). The other three seasons are globally anchored to calendar quarters.
+- **Career stats and racer condition persist across seasons.** Fatigue, morale, and race form carry over — an untrained racer decays between seasons exactly as in the real sport.
+- Between-season intermission: 1–2 weeks of recovery content (cosmetic shop, leaderboard review, preseason teaser).
 
 ### 12.3 Cred Points (CP)
 

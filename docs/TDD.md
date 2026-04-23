@@ -834,8 +834,8 @@ Test core logic without rendering:
 - Training day: all 8 activities reachable
 - Over-training lock triggers at fatigue ≥ 80
 - Injury event fires (forced by debug flag)
-- Race: 50 laps completes correctly
-- Bell lap audio fires on lap 49 crossing
+- Race: 600 laps completes correctly within 15–20 minutes of wall-clock time
+- Bell lap audio fires as leader crosses the line to begin lap 600
 - Exchange zone button appears/disappears correctly
 - The Burn combo registers correctly
 - 6-player race with AI bots: no desync crashes

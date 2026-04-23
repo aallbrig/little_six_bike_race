@@ -7,14 +7,28 @@
 
 ## Overview
 
-Implement the main race scene: track, riders, physics, game loop (50 laps), rider exchange system (Phase 2), the burn mechanic, HUD, and race results. This spec covers everything within the race itself — networking is handled in Spec 005.
+Implement the main race scene: track, riders, physics, game loop (**600 laps**, targeting a 15–20 minute run-time), rider exchange system (Phase 2), the burn mechanic, HUD, and race results. This spec covers everything within the race itself — networking is handled in Spec 005.
+
+The 600-lap target is a product decision; see [ADR 0001](../adr/0001-schedule-alignment-with-little-500.md) and [GDD §8](../GDD.md). In-game lap pacing must average roughly 1.5–2.0 seconds per lap so that a race finishes within the 15–20 minute window.
 
 ---
 
 ## Requirements
 
+### REQ-004-000: Race Format Variants
+
+The same race scene and controller serves three distinct **race formats**, configured via a `RaceFormat` resource passed to `RaceController` at scene load:
+
+| Format | Lap count | Hard time cap | Source spec |
+|---|---|---|---|
+| `WEEKLY`  | 150 laps | 5:00 (leader position freezes if exceeded) | [Spec 012 REQ-012-001](spec_012_weekly_races_and_leaderboards.md) |
+| `FINALE`  | 600 laps | none | [GDD §8](../GDD.md), [ADR 0001](../adr/0001-schedule-alignment-with-little-500.md) |
+| `QUICKPLAY` | 150 laps | 5:00 | Offline drop-in; mirrors WEEKLY for parity |
+
+`RaceFormat` is a plain GDScript `Resource` (`scripts/race/RaceFormat.gd`) with fields `{ laps: int, time_cap_sec: int, allows_momentum: bool }`. The RaceController reads it at `_ready` and exposes `total_laps` and `time_cap_sec` to the HUD. All other race mechanics are identical across formats.
+
 ### REQ-004-001: Race Scene Structure
-`scenes/race/RaceTrack.tscn` — the main race environment. Must support both single-player (AI only) and multiplayer (mixed human/AI).
+`scenes/race/RaceTrack.tscn` — the main race environment. Must support both single-player (AI only) and multiplayer (mixed human/AI). Format is injected via a `RaceFormat` resource (REQ-004-000).
 
 Required nodes (see TDD Section 5.1 for full hierarchy):
 - `WorldEnvironment` with sky gradient and sun light
@@ -58,9 +72,8 @@ Rider (CharacterBody3D)
 
 Physics constants (tunable via export vars on RaceController):
 ```
-MAX_SPEED_BASE := 12.0          # m/s (~43 km/h), affected by Speed stat
-SPRINT_SPEED_BONUS := 0.15      # +15% to max speed when sprinting
-ACCEL := 5.0                    # m/s² acceleration
+MAX_SPEED_BASE := 12.0          # m/s (~43 km/h) soft cap; actual top speed emerges from pedal power
+SPRINT_SPEED_BONUS := 0.15      # +15% to soft-cap while sprinting
 BRAKE_DECEL := 18.0             # m/s² deceleration (coaster brake)
 COAST_DECEL := 0.5              # m/s² passive deceleration (no pedaling, no brake)
 MAX_STEER_ANGLE := 45.0         # degrees/sec at max steer input
@@ -70,113 +83,199 @@ SPRINT_REFILL := 10.0           # sprint energy refill units/sec
 SPRINT_BAR_MAX := 100.0
 SPRINT_LOCKOUT_TIME := 3.0      # seconds after sprint bar empties
 
-RACE_FATIGUE_BASE_DRAIN := 3.0  # units/sec while riding
+# Pedal-power conversion (ADR 0003; GDD §5.2)
+WATTS_PER_MPS := 40.0           # rough bike drag constant; adjust during playtest
+POWER_DECAY_PER_SEC := 0.85     # accumulated power bleeds out each second if not refreshed
+
+RACE_FATIGUE_BASE_DRAIN := 3.0  # units/sec while riding (pre-stat)
 RACE_FATIGUE_SPRINT_BONUS := 4.0 # additional units/sec while sprinting
 DRAFT_FATIGUE_REDUCTION := 0.5  # multiplier while drafting (50% reduction)
-DRAFT_SPEED_BONUS := 0.03       # +3% speed while in draft
+DRAFT_SPEED_BONUS := 0.03       # base; amplified by Race IQ (GDD §5.2)
 ```
 
-Stat scaling:
-```gdscript
-func _get_effective_max_speed() -> float:
-    var speed_factor = racer_stats.speed / 100.0  # 0.0-1.0
-    return lerp(MAX_SPEED_BASE * 0.7, MAX_SPEED_BASE * 1.2, speed_factor)
-    # Low Speed stat rider: 8.4 m/s max
-    # High Speed stat rider: 14.4 m/s max
+Stat scaling — all formulas come from [GDD §5.2](../GDD.md):
 
-func _get_endurance_fatigue_rate() -> float:
+```gdscript
+func _get_soft_cap_speed() -> float:
+    # Soft-cap: the bike will not exceed this even if pedal power is high.
+    # Power still matters because reaching the cap requires sustained high-quality cadence.
+    var power_factor = racer_stats.power / 100.0
+    return lerp(MAX_SPEED_BASE * 0.7, MAX_SPEED_BASE * 1.2, power_factor)
+
+func _get_effective_fatigue_drain() -> float:
     var endurance_factor = racer_stats.endurance / 100.0
     return lerp(RACE_FATIGUE_BASE_DRAIN * 1.5, RACE_FATIGUE_BASE_DRAIN * 0.6, endurance_factor)
-    # Low Endurance: drains 4.5 units/sec
-    # High Endurance: drains 1.8 units/sec
+
+func _get_effective_recovery_rate() -> float:
+    # While coasting or drafting, fatigue bleeds off at this rate.
+    return 0.8 + racer_stats.recovery / 25.0        # 0.8 → 4.8/s at 0→100
+
+func _get_draft_speed_bonus() -> float:
+    return DRAFT_SPEED_BONUS + racer_stats.race_iq / 500.0   # 0.08 → 0.28 at 0→100
+
+func _get_corner_speed_factor() -> float:
+    return 0.55 + racer_stats.handling / 250.0      # 0.55 → 0.95 at 0→100
 ```
 
-### REQ-004-005: Input Handling — Mobile and Desktop
+### REQ-004-005: Input Handling — Four-Button Pedal + Steer
 
-**Mobile — Tilt:**
+Input follows the four-button control scheme specified in [ADR 0003 — Input Control Scheme](../adr/0003-input-control-scheme.md). Buttons are rendered in `RaceInputOverlay.tscn` (see [Spec 007 REQ-007-006](spec_007_mobile_ui_ux.md)).
+
+**Input actions** (defined in `project.godot`):
+
+| Action | Purpose | Default keyboard | Default mobile button |
+|---|---|---|---|
+| `pedal_left`   | Pedal stroke — left leg  | `A` or `Left Shift`  | Bottom-left, 96×96 px |
+| `pedal_right`  | Pedal stroke — right leg | `D` or `Right Shift` | Bottom-right, 96×96 px |
+| `steer_left`   | Hold to turn left        | `Left Arrow`         | Upper-left inside, 72×72 px |
+| `steer_right`  | Hold to turn right       | `Right Arrow`        | Upper-right inside, 72×72 px |
+| `brake`        | Progressive brake        | `Space`              | Bottom-right, above Pedal R, 72×72 px |
+| `exchange`     | Relay handoff (Phase 2)  | `E`                  | Bottom-center, 88×88 px, pit-zone only |
+
+**Steering (hold-to-turn, binary):**
 ```gdscript
 func _get_steer_input() -> float:
-    if SaveManager.get_setting("use_tilt", true):
-        var accel = Input.get_accelerometer()
-        var sensitivity = SaveManager.get_setting("tilt_sensitivity", 1.0)
-        # Tilt on Y axis: -9.8 (full left) to +9.8 (full right)
-        return clamp(accel.y / (9.8 * 0.4 / sensitivity), -1.0, 1.0)
-    return 0.0
-```
-
-**Mobile — Touch (tap left/right half of screen):**
-- Left half tap held → steer left
-- Right half tap held → steer right
-- Both halves held → steer = 0 (straight)
-- Implemented via a `TouchScreenButton` or `InputEventScreenTouch` handler in HUD
-
-**Desktop:**
-```gdscript
-func _get_steer_input_keyboard() -> float:
     var steer := 0.0
-    if Input.is_action_pressed("steer_left"): steer -= 1.0
+    if Input.is_action_pressed("steer_left"):  steer -= 1.0
     if Input.is_action_pressed("steer_right"): steer += 1.0
+    # Holding both cancels to straight (0.0). Most-recently-pressed wins on flip.
     return steer
 ```
 
-**Combined (tilt + touch fallback):**
+Tilt is **no longer a primary input.** It is available as an opt-in accessibility assist (Settings → Controls → "Tilt Assist"). When enabled, tilt is additive to the steer buttons; the buttons always override tilt.
+
+**Pedal cadence (alternating taps produce thrust):**
 ```gdscript
-func _get_steer_input() -> float:
-    var touch = _get_steer_input_touch()
-    var tilt = _get_steer_input_tilt()
-    var keyboard = _get_steer_input_keyboard()
-    # Priority: touch > tilt if touch active, else tilt; keyboard always additive
-    if abs(touch) > 0.05:
-        return clamp(touch + keyboard, -1.0, 1.0)
-    return clamp(tilt + keyboard, -1.0, 1.0)
+# RiderController.gd — cadence state
+var _last_pedal: String = ""              # "" | "left" | "right"
+var _last_pedal_time_ms: int = 0
+var _current_cadence_ms: float = 600.0    # target interval, tuned per gear/speed
+var _power_accum_watts: float = 0.0
+
+func _on_pedal_pressed(side: String) -> void:
+    var now_ms = Time.get_ticks_msec()
+    var interval = now_ms - _last_pedal_time_ms
+
+    # Alternation check: must differ from previous pedal to count
+    if _last_pedal == side:
+        _register_missed_stroke()
+        return
+
+    # Timing quality: compare interval to target power window
+    var window = _power_window_width_ms()
+    var ideal = _current_cadence_ms
+    var error = abs(interval - ideal)
+    var quality: float
+    if error <= window / 2.0:
+        quality = 1.0                      # perfect window
+    elif error <= window:
+        quality = 1.0 - (error - window / 2.0) / (window / 2.0)   # linear falloff
+    else:
+        quality = 0.0                      # outside window → no power
+
+    _power_accum_watts += _power_per_stroke_watts() * quality
+    _last_pedal = side
+    _last_pedal_time_ms = now_ms
+    EventBus.pedal_stroke.emit(side, quality)   # for HUD feedback & audio
+
+func _power_window_width_ms() -> float:
+    # ADR 0003 + GDD §5.2: width driven by Cadence stat, amplified by Season Momentum
+    var cadence = racer_stats.cadence                    # 0-100
+    var momentum = racer_stats.season_momentum           # 0-10
+    var base_ms = 60.0 + cadence * 1.4                   # 60-200 ms at 0→100
+    var momentum_mult = 1.0 + (momentum * 0.01)          # +0-10%
+    var fatigue_mult = lerp(1.0, 0.55, race_fatigue / 100.0)  # window narrows as you tire
+    return base_ms * momentum_mult * fatigue_mult
+
+func _power_per_stroke_watts() -> float:
+    # GDD §5.2: Power stat sets ceiling
+    return 120.0 + racer_stats.power * 3.8               # 120-500 W at 0→100
+
+func _register_missed_stroke() -> void:
+    # Small rhythm penalty: momentarily narrow the next window by ~15%
+    _cadence_penalty_timer = 0.5
+    EventBus.pedal_missed.emit()
 ```
 
-### REQ-004-006: Coaster Brake Physics
-The bike does not slow when the player stops accelerating — it coasts. Braking requires explicit brake input.
+The accumulated `_power_accum_watts` bleeds into `current_speed` via the physics step in REQ-004-006. No auto-acceleration anywhere — if the player stops pedaling, the bike coasts.
+
+**Sprint (hold-both-pedals, ≥ 200ms commit):**
+```gdscript
+var _both_held_since_ms: int = 0
+
+func _process_sprint() -> void:
+    var both = Input.is_action_pressed("pedal_left") and Input.is_action_pressed("pedal_right")
+    var now = Time.get_ticks_msec()
+    if both:
+        if _both_held_since_ms == 0:
+            _both_held_since_ms = now
+        elif now - _both_held_since_ms >= 200 and sprint_energy > 0 and not sprint_locked:
+            _sprint_held = true
+    else:
+        _both_held_since_ms = 0
+        _sprint_held = false
+```
+
+While `_sprint_held`, alternation is no longer required and the game treats both pedals as simultaneously driving the bike at a higher, Sprint-speed target. Sprint energy drains per existing REQ-004-007.
+
+**The Burn** (Sprint + Exchange in pit zone): unchanged semantics from [GDD §8](../GDD.md) — tap `exchange` while `_sprint_held` and inside the pit zone.
+
+**Accessibility assists** (Settings → Controls, all default OFF):
+- `auto_cadence_assist`: single pedal hold substitutes for alternation. In-race ceiling drops by ~10%.
+- `steering_assist`: soft racing-line correction when no steer button is pressed.
+- `tilt_assist`: additive accelerometer steering, always overridden by steer buttons when pressed.
+
+### REQ-004-006: Coaster Brake Physics + Pedal-Power Integration
+
+The bike does not auto-accelerate. Speed is produced by the pedal-power accumulator fed from REQ-004-005, bounded by a Power-derived soft-cap, and decays when the player stops pedaling. Braking is a dedicated input (coaster-brake framing preserved as visual only — see [ADR 0003 §3](../adr/0003-input-control-scheme.md)).
 
 ```gdscript
 func _physics_process(delta: float) -> void:
     var steer_input = _get_steer_input()
     var is_braking = Input.is_action_pressed("brake")
+    _process_sprint()                              # see REQ-004-005
     var is_sprinting = _sprint_held and sprint_energy > 0 and not sprint_locked
 
-    # Determine target speed
-    var base_max = _get_effective_max_speed()
-    var target_speed = base_max
+    # Convert accumulated pedal watts into a speed target
+    var soft_cap = _get_soft_cap_speed()
     if is_sprinting:
-        target_speed = base_max * (1.0 + SPRINT_SPEED_BONUS)
+        soft_cap *= (1.0 + SPRINT_SPEED_BONUS)
+    var pedal_target_speed = min(_power_accum_watts / WATTS_PER_MPS, soft_cap)
 
-    # Deceleration
     if is_braking:
         current_speed = move_toward(current_speed, 0.0, BRAKE_DECEL * delta)
-    elif current_speed > target_speed:
-        current_speed = move_toward(current_speed, target_speed, COAST_DECEL * delta)
+    elif pedal_target_speed > current_speed:
+        # Accelerate toward the pedal-produced target
+        current_speed = move_toward(current_speed, pedal_target_speed, (pedal_target_speed - current_speed) * 3.0 * delta)
     else:
-        current_speed = move_toward(current_speed, target_speed, ACCEL * delta)
+        # Coast — no accel, only friction
+        current_speed = move_toward(current_speed, 0.0, COAST_DECEL * delta)
 
-    # Apply drafting
+    # Pedal power bleeds out over time (stops ramping if the rider idles)
+    _power_accum_watts *= pow(POWER_DECAY_PER_SEC, delta)
+
+    # Apply drafting (stat-scaled bonus)
     if _is_drafting:
-        current_speed = min(current_speed * (1.0 + DRAFT_SPEED_BONUS), target_speed * 1.05)
+        current_speed = min(current_speed * (1.0 + _get_draft_speed_bonus()), soft_cap * 1.05)
 
-    # Steer
+    # Steer (binary hold input from REQ-004-005)
     var steer_rad = deg_to_rad(MAX_STEER_ANGLE * steer_input * delta)
     direction = direction.rotated(Vector3.UP, steer_rad)
     direction = direction.normalized()
 
-    # Apply corner speed cap
-    if _is_in_turn and current_speed > base_max * CORNER_SPEED_CAP:
-        _roll_crash_check(current_speed / base_max)
+    # Corner crash check — uses stat-scaled corner tolerance
+    if _is_in_turn and current_speed > soft_cap * _get_corner_speed_factor():
+        _roll_crash_check(current_speed / soft_cap)
 
     # Move
     velocity = direction * current_speed
     move_and_slide()
 
-    # Update sprint energy
     _update_sprint(delta, is_sprinting)
-
-    # Update race fatigue
     _update_race_fatigue(delta, is_sprinting)
 ```
+
+The visible animation during `is_braking` shows the rider back-pedaling (coaster-brake theme). The actual input is the dedicated brake button.
 
 ### REQ-004-007: Sprint System
 ```gdscript
@@ -344,34 +443,41 @@ func _trigger_bell_lap() -> void:
 ```
 
 ### REQ-004-012: Race HUD
-`scenes/ui/HUD.tscn` — in-race overlay (CanvasLayer, landscape-oriented).
+`scenes/ui/HUD.tscn` — in-race overlay (CanvasLayer, landscape-oriented). Matches the four-button layout in [ADR 0003 §6](../adr/0003-input-control-scheme.md) and [Spec 007 REQ-007-006](spec_007_mobile_ui_ux.md).
 
 Elements and positions:
 ```
 ┌─────────────────────────────────────────┐
-│ LAP: 12/50   [MINIMAP]     Signal: ●    │  ← top strip
-│ POS: 2nd                   PING: 45ms   │
+│ LAP: 12/{total}  [MINIMAP]   Signal: ●  │  ← top strip
+│ POS: 2nd                     PING: 45ms │
 │                                         │
+│ [◀ STEER L]                [STEER R ▶]  │  ← steer rail (upper-inside)
 │                                         │
-│               [3D RACE VIEW]            │
+│            [3D RACE VIEW]               │
 │                                         │
+│                 [EXCHANGE]              │  ← pit-zone only, bottom-center
 │                                         │
-│                                         │
-│[FATIGUE ARC]              [SPRINT BAR]  │
-│                    [EXCHANGE] [BRAKE]   │  ← bottom row
+│[FATIGUE]                      [SPRINT]  │
+│[PEDAL L ▼]         [BRAKE ⬤]  [PEDAL R▼]│  ← pedal + brake row
 └─────────────────────────────────────────┘
 ```
 
 Component specs:
-- **Lap counter:** "LAP [N] / 50" - Press Start 2P 20px, top-left
-- **Position badge:** "1ST / 2ND / 3RD..." - large crimson badge, top-left below lap
-- **Minimap:** 128×128px SubViewport, top-center
-- **Ping indicator:** small dot + ms number, top-right (green <80ms, amber 80-200ms, red >200ms)
-- **Sprint bar:** vertical gauge, right side, 180px tall × 24px wide, amber fill
-- **Fatigue arc:** semicircle arc gauge, bottom-left, 100px radius, color-shifts green→red
-- **Brake button:** circle, 80px diameter, bottom-right
-- **Exchange button:** only visible when in pit zone; pulses with team color; center-bottom
-- **Sprint button:** above brake button; hold to activate
+- **Lap counter:** "LAP [N] / {total}" where `{total}` comes from `RaceController.total_laps` (150 for weekly/quickplay, 600 for finale) — Press Start 2P 20px, top-left.
+- **Position badge:** "1ST / 2ND / 3RD..." - large crimson badge, top-left below lap.
+- **Minimap:** 128×128px SubViewport, top-center.
+- **Ping indicator:** small dot + ms number, top-right (green <80ms, amber 80-200ms, red >200ms).
+- **Race timer** *(weekly / quickplay only)*: "TIME: 02:14 / 5:00" countdown shown under the minimap; hidden on finale format. Pulses red in the final 30 seconds.
+- **Steer Left / Steer Right:** 72×72 px, upper-inside, 12 px inset from the screen edge. Pressed state: crimson fill.
+- **Pedal Left / Pedal Right:** 96×96 px, bottom-inside. Flashes briefly on each successful power stroke (color intensity encodes stroke quality from REQ-004-005).
+- **Brake button:** 72×72 px circle, bottom-right cluster (between Pedal R and the screen edge's safe-area margin), reachable by the right thumb without leaving Pedal R.
+- **Exchange button:** 88×88 px, bottom-center, only visible when in pit zone; pulses with team color.
+- **Sprint bar:** vertical gauge, right side above the pedal row, 180px tall × 24px wide, amber fill. Populated from sprint energy.
+- **Fatigue arc:** semicircle arc gauge, above Pedal L (bottom-left), 100px radius, color-shifts green→red.
+- **Cadence indicator** *(new)*: thin ring around each pedal button that fills as the next ideal stroke window approaches and depletes after it passes. Gives visual rhythm feedback. Color: green inside the power window, amber at edge, grey outside.
+- **Momentum badge** *(new, top-left under POS)*: small "🔥 N/10" readout (text only — see Spec 012 REQ-012-011). Hidden if Momentum = 0.
+
+The HUD must render correctly on 375×812 landscape (iPhone SE-ish after rotation) and 430×932 landscape (iPhone 15 Pro Max). Safe-area insets respected per Spec 007 REQ-007-005.
 
 ### REQ-004-013: Race Results Scene
 `scenes/results/RaceResults.tscn`:
@@ -460,7 +566,7 @@ network_message_received("RACE_FINISHED", payload) → trigger results
 - [ ] Exchange button appears only when local rider is in pit zone
 - [ ] The Burn combo registers (Sprint held + Exchange tapped simultaneously)
 - [ ] Burn audio and "BURN!" overlay play on successful burn
-- [ ] 50 laps completes the race (lap counter reaches 50/50)
+- [ ] 600 laps completes the race (lap counter reaches 600/600) within the 15–20 minute target run-time
 - [ ] Race results scene shows all 6 positions with times
 - [ ] AI riders run the full race without errors
 - [ ] Minimap shows all rider positions
