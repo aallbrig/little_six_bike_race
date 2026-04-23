@@ -9,4 +9,7 @@ func _on_train_pressed() -> void:
     GameManager.transition_to(GameManager.GameState.TRAINING_DAY)
 
 func _on_race_pressed() -> void:
-    GameManager.transition_to(GameManager.GameState.LOBBY)
+    # Use matchmaking instead of direct lobby
+    var matchmaking = load("res://scripts/network/MatchmakingClient.gd").new()
+    add_child(matchmaking)
+    matchmaking.quick_match()

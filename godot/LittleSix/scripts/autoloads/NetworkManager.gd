@@ -58,15 +58,18 @@ func _process(delta: float) -> void:
 
     _websocket.poll()
 
+    var state_changed = false
     match _websocket.get_ready_state():
         WebSocketPeer.STATE_OPEN:
             if state == ConnectionState.CONNECTING:
                 state = ConnectionState.CONNECTED
                 EventBus.connected_to_server.emit()
                 _heartbeat_timer.start()
+                state_changed = true
         WebSocketPeer.STATE_CLOSED:
             if state != ConnectionState.DISCONNECTED:
                 disconnect_gracefully()
+                state_changed = true
 
     # Process incoming messages
     while _websocket.get_available_packet_count() > 0:
@@ -75,7 +78,25 @@ func _process(delta: float) -> void:
         var message = JSON.parse_string(json_string)
 
         if message and message.has("type"):
-            EventBus.network_message_received.emit(message.type, message.get("payload", {}))
+            _handle_network_message(message.type, message.get("payload", {}))
+
+func _handle_network_message(msg_type: String, payload: Dictionary) -> void:
+    match msg_type:
+        "HEARTBEAT_ACK":
+            # Update ping
+            ping_ms = int(Time.get_unix_time_from_system() * 1000) % 1000  # Simplified
+            EventBus.latency_updated.emit(ping_ms)
+        "RACE_START":
+            EventBus.race_started.emit()
+            state = ConnectionState.IN_RACE
+        "WORLD_STATE":
+            # Handle race synchronization from server
+            EventBus.network_message_received.emit(msg_type, payload)
+        "RACE_FINISHED":
+            EventBus.race_finished.emit(payload.get("results", []))
+            state = ConnectionState.IN_ROOM
+        _:
+            EventBus.network_message_received.emit(msg_type, payload)
 
 func _send_heartbeat() -> void:
     if state in [ConnectionState.IN_ROOM, ConnectionState.IN_RACE]:
