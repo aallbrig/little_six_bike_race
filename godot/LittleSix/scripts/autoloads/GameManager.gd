@@ -70,9 +70,13 @@ func _exit_state(state: GameState) -> void:
     pass
 
 func _load_scene(scene_path: String, data: Dictionary = {}) -> void:
-    # TODO: Implement scene loading logic
-    # For now, just print for debugging
-    print("Loading scene: " + scene_path + " with data: " + str(data))
+    # Use SceneTree to change scenes with transition support
+    var current_scene = get_tree().current_scene
+    if current_scene and current_scene.name != "Logo":
+        # For now, just change scene. TransitionManager will be added in full Spec 002
+        get_tree().change_scene_to_file(scene_path)
+    else:
+        get_tree().change_scene_to_file(scene_path)
 
 func quit_to_host(reason: String = "player_exit") -> void:
     HostBridge.emit_to_host("quit", { "reason": reason })
