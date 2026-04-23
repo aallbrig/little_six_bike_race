@@ -29,6 +29,7 @@ AudioManager="*res://scripts/autoloads/AudioManager.gd"
 NetworkManager="*res://scripts/autoloads/NetworkManager.gd"
 HostBridge="*res://scripts/autoloads/HostBridge.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
+TransitionManager="*res://scripts/autoloads/TransitionManager.gd"
 
 [display]
 
