@@ -70,10 +70,18 @@ func _finish_race() -> void:
 func start_race() -> void:
     EventBus.race_started.emit()
     
+    # Add HUD
+    var hud_scene = load("res://scenes/ui/HUD.tscn")
+    if hud_scene:
+        var hud = hud_scene.instantiate()
+        add_child(hud)
+    
     # Start AI riders
     for rider in riders:
         if rider.is_ai:
             rider.is_pedaling = true
+    
+    print("Race started with HUD and physics simulation")
 
 func get_leader() -> Node:
     if riders.is_empty():
