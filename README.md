@@ -30,6 +30,55 @@ Little Six is in active development with spec-driven implementation. Core projec
 - Spec 007 — Mobile UI/UX (touch controls, responsive layouts)
 - Spec 004 — Multiplayer Race (core racing mechanics)
 
+## Development
+
+Little Six uses **Make** as the primary interface for development tasks. All commands delegate to shell scripts in the `scripts/` directory for portability and maintainability.
+
+### Quick Start
+
+```bash
+# Start development environment
+make dev-setup
+
+# Or start components individually
+make website      # Start marketing site server
+make localstack   # Start local AWS simulation
+make matchmaking  # Start matchmaking service
+```
+
+### Available Commands
+
+| Command | Description |
+|---|---|
+| `make help` | Show all available commands |
+| `make website` | Start marketing website server (http://localhost:8000) |
+| `make game` | Run the Godot game |
+| `make editor` | Open Godot editor |
+| `make localstack` | Start LocalStack for AWS testing |
+| `make matchmaking` | Run matchmaking service locally |
+| `make sam-build` | Build SAM application |
+| `make sam-api` | Start SAM local API (http://localhost:3000) |
+| `make sam-deploy` | Deploy to AWS |
+| `make build-site` | Build static website |
+| `make export-web` | Export Godot game for web |
+| `make deploy` | Full deployment pipeline |
+| `make dev-setup` | Start website + LocalStack together |
+
+### Development Workflow
+
+1. **Setup**: Run `make dev-setup` to start all local services
+2. **Develop**: Use `make editor` to work on the game, `make website` to preview the site
+3. **Test**: Use `make sam-api` for backend testing with LocalStack
+4. **Deploy**: Use `make deploy` for full AWS deployment
+
+### Prerequisites
+
+- **Godot 4.6** - For game development
+- **Python 3** or **Node.js** - For website server
+- **Docker + Docker Compose** - For LocalStack
+- **AWS SAM CLI** - For AWS deployment (optional)
+- **Make** - For running commands
+
 ## Documentation
 
 | Document | Description |
