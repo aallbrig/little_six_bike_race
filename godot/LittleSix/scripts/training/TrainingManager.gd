@@ -1,9 +1,9 @@
 extends Node
 
 # Training day state
-var current_week = 1
-var current_day = 1
-var selected_activities = []  # Array of TrainingActivity.Type
+var current_week: int = 1
+var current_day: int = 1
+var selected_activities: Array[int] = []  # Array of TrainingActivity.Type
 
 func _ready() -> void:
     EventBus.game_state_changed.connect(_on_game_state_changed)
@@ -33,7 +33,7 @@ func select_activity(activity_type: int, slot: int) -> bool:
     # Check fatigue gating and injury rules (simplified)
     var racer = _get_current_racer()
     if racer and racer.fatigue >= 80:
-        var allowed = [TrainingActivity.RECOVERY_SPIN, TrainingActivity.REST_DAY, TrainingActivity.NUTRITION_PLAN]
+        var allowed = [TrainingActivity.Type.RECOVERY_SPIN, TrainingActivity.Type.REST_DAY, TrainingActivity.Type.NUTRITION_PLAN]
         if not activity_type in allowed:
             return false
     

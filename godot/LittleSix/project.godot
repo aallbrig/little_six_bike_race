@@ -76,6 +76,14 @@ ui_back={
 ]
 }
 
+[gdscript]
+
+warnings/enable=true
+warnings/unsafe_property_access=2
+warnings/unsafe_method_access=2
+warnings/unsafe_cast=2
+warnings/unsafe_call_argument=2
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

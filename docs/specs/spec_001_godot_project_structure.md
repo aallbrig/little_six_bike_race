@@ -110,6 +110,14 @@ Do NOT exclude `export_presets.cfg` itself (needed for CI/CD).
 ### REQ-001-012: HostBridge — Web Host Communication
 `HostBridge.gd` is a lightweight autoload responsible for all communication between the Godot client and the hosting web page. The host page is defined in Spec 011 (Static Marketing Website & Game Host); this autoload implements the Godot side of the `postMessage` contract in Spec 011 REQ-011-005.
 
+### REQ-001-013: Type-Safe GDScript
+All GDScript files must be written with strict typing enabled:
+- All variables must have explicit type annotations (e.g., `var count: int = 0`)
+- All function parameters and return types must be typed (e.g., `func foo(bar: String) -> int:`)
+- The project must enable strict type checking warnings in `project.godot` under `[gdscript]` section: `warnings/enable=true` with unsafe access warnings set to error level (2)
+- Code must pass Godot's built-in type checker without warnings when running `godot --headless --editor --quit`
+- Use gdlint for additional style and safety checks
+
 Must implement:
 - `const SOURCE := "little-six-game"` and `const VERSION := 1` matching the envelope in Spec 011.
 - `emit_to_host(type: String, payload: Dictionary = {}) -> void` — posts a message to the host window. Wraps the payload in the canonical envelope `{ source, version, type, payload }` and calls `JavaScriptBridge.get_interface("window").postMessage(envelope, origin)`. On non-web or headless builds (`OS.has_feature("web") == false` or `DisplayServer.get_name() == "headless"`), this is a silent no-op.
@@ -178,6 +186,7 @@ EventBus.game_state_changed → update music for new state
 
 - [ ] `godot/LittleSix/project.godot` opens without errors in Godot 4.6
 - [ ] `project.godot` declares the Compatibility renderer (`rendering/renderer/rendering_method = "gl_compatibility"`) for both desktop and mobile
+- [ ] `godot --headless --editor --quit` runs without script errors or type warnings
 - [ ] All 6 autoloads load without errors on startup
 - [ ] `EventBus` is accessible as `EventBus` from any script (autoloaded)
 - [ ] `GameManager.transition_to(GameManager.GameState.LOGO)` runs without error

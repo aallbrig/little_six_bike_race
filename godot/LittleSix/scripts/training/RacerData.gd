@@ -28,7 +28,7 @@ func get_race_form() -> String:
     else:
         return "HOT"
 
-func apply_training(activity: TrainingActivity) -> Dictionary:
+func apply_training(activity: TrainingActivity.Type) -> Dictionary:
     # Returns dict of stat changes
     var changes = {}
     var effects = TrainingActivity.EFFECTS.get(activity, {})
