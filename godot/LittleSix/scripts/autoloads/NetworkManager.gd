@@ -9,6 +9,8 @@ enum ConnectionState {
 }
 
 var state: ConnectionState = ConnectionState.DISCONNECTED
+var local_player_id: int = -1
+var current_room_id: String = ""
 var ping_ms: int = 0
 var _websocket: WebSocketPeer = null
 var _heartbeat_timer: Timer = null
@@ -23,15 +25,32 @@ func _ready() -> void:
     _heartbeat_timer.timeout.connect(_send_heartbeat)
     add_child(_heartbeat_timer)
 
-func connect_to_server(url: String, token: String) -> void:
+func connect_to_matchmaking(server_url: String) -> void:
     if state != ConnectionState.DISCONNECTED:
         return
 
     state = ConnectionState.CONNECTING
     _websocket = WebSocketPeer.new()
-    _websocket.connect_to_url(url)
+    _websocket.connect_to_url(server_url)
 
     # TODO: Send token in handshake
+
+func join_quick_race() -> void:
+    if state != ConnectionState.CONNECTED:
+        return
+    send_message("JOIN_QUICK_RACE", {})
+
+func join_private_room(room_code: String) -> void:
+    if state != ConnectionState.CONNECTED:
+        return
+    send_message("JOIN_PRIVATE_ROOM", { "room_code": room_code })
+
+func create_private_room() -> String:
+    if state != ConnectionState.CONNECTED:
+        return ""
+    var room_id = str(randi())  # Placeholder
+    send_message("CREATE_PRIVATE_ROOM", {})
+    return room_id
 
 func send_message(msg_type: String, payload: Dictionary) -> void:
     if state == ConnectionState.DISCONNECTED:

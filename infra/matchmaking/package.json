@@ -4,7 +4,9 @@
   "description": "LocalStack testing for Little Six matchmaking Lambda",
   "scripts": {
     "test": "echo \"LocalStack matchmaking test\"",
-    "deploy-local": "echo \"Deploying to LocalStack...\""
+    "deploy-local": "echo \"Deploying to LocalStack...\"",
+    "dev": "node index.js",
+    "start": "node index.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1000.0"

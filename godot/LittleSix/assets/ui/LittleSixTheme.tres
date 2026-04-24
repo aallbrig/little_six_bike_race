@@ -1,0 +1,95 @@
+[gd_resource type="Theme" load_steps=1 format=3 uid="uid://little-six-theme"]
+
+[resource]
+default_font_size = 18
+
+# Font colors
+Label/colors/font_color = Color(0.960784, 0.960784, 0.941176, 1)  # #F5F5F0 cream
+Label/colors/font_disabled_color = Color(0.392157, 0.447059, 0.545098, 1)  # #64748B slate
+Label/colors/font_placeholder_color = Color(0.611765, 0.639216, 0.686275, 1)  # #9CA3AF
+
+# Button styles
+Button/styles/normal = SubResource("StyleBoxFlat_normal")
+Button/styles/hover = SubResource("StyleBoxFlat_hover")
+Button/styles/pressed = SubResource("StyleBoxFlat_pressed")
+Button/styles/disabled = SubResource("StyleBoxFlat_disabled")
+# Button/fonts/font = ExtResource("3")  # TODO: Add Press Start 2P font
+Button/font_sizes/font_size = 18
+Button/constants/minimum_size = Vector2(0, 56)
+
+# Secondary button style
+Button/styles/secondary_normal = SubResource("StyleBoxFlat_secondary_normal")
+Button/styles/secondary_hover = SubResource("StyleBoxFlat_secondary_hover")
+
+# Panel styles
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_panel")
+
+# ProgressBar styles
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_progress_fill")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
+bg_color = Color(0.701961, 0.105882, 0.105882, 1)  # #B31B1B crimson
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+bg_color = Color(0.764706, 0.12549, 0.12549, 1)  # #C32020
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pressed"]
+bg_color = Color(0.545098, 0.082353, 0.082353, 1)  # #8B1515
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_disabled"]
+bg_color = Color(0.215686, 0.254902, 0.317647, 0.5)  # #374151 at 50% opacity
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_secondary_normal"]
+bg_color = Color(0, 0, 0, 0)  # transparent
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.980392, 0.952941, 0.878431, 1)  # #FAF3E0
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_secondary_hover"]
+bg_color = Color(0.980392, 0.952941, 0.878431, 0.1)  # #FAF3E0 at 10% opacity
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.980392, 0.952941, 0.878431, 1)  # #FAF3E0
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.109804, 0.109804, 0.117647, 1)  # #1C1C1E
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.215686, 0.254902, 0.317647, 1)  # #374151
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill"]
+bg_color = Color(0.086275, 0.627451, 0.266667, 1)  # #16A34A green

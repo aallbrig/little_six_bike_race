@@ -1,19 +1,12 @@
 extends Node
 
-const SAVE_PATH = "user://save.json"
+const SAVE_PATH := "user://save.json"
 
-var player_data = null  # Will hold PlayerData dict for now
-var settings_data = {
-    "music_volume": 0.8,
-    "sfx_volume": 1.0,
-    "use_tilt_controls": true,
-    "tilt_sensitivity": 1.0,
-    "text_scale": "M",
-    "high_contrast": false,
-    "reduce_motion": false
-}
+var player_data: PlayerData = null
+var settings_data: SettingsData = null
 
 func _ready() -> void:
+    settings_data = SettingsData.new()  # Always initialize with defaults
     load_game()
 
 func load_game() -> bool:
@@ -35,10 +28,16 @@ func load_game() -> bool:
 
     var data = json.get_data()
     if data.has("player"):
-        player_data = data.player  # Store as dict for now
+        # Deserialize PlayerData from dict
+        player_data = PlayerData.new()
+        player_data.from_dict(data.player)
 
     if data.has("settings"):
-        settings_data = data.settings
+        # Deserialize SettingsData from dict
+        settings_data.from_dict(data.settings)
+    else:
+        # Use defaults
+        settings_data = SettingsData.new()
 
     return player_data != null
 
@@ -46,9 +45,9 @@ func save_game() -> void:
     var data = {}
 
     if player_data:
-        data["player"] = player_data  # Store as dict for now
+        data["player"] = player_data.to_dict()
 
-    data["settings"] = settings_data
+    data["settings"] = settings_data.to_dict()
 
     var json_string = JSON.stringify(data, "\t")
 
@@ -65,9 +64,49 @@ func wipe_save() -> void:
         dir.remove("save.json")
     player_data = null
 
-func get_setting(key: String, default = null):
-    return settings_data.get(key, default)
+func get_setting(key: String, default: Variant = null) -> Variant:
+    if settings_data:
+        match key:
+            "music_volume": return settings_data.music_volume
+            "sfx_volume": return settings_data.sfx_volume
+            "use_tilt_controls": return settings_data.use_tilt_controls
+            "tilt_sensitivity": return settings_data.tilt_sensitivity
+            "text_scale": return settings_data.text_scale
+            "high_contrast": return settings_data.high_contrast
+            "reduce_motion": return settings_data.reduce_motion
+            "display_name": return settings_data.display_name
+    return default
 
-func set_setting(key: String, value) -> void:
-    settings_data[key] = value
-    save_game()  # Auto-save settings
+func set_setting(key: String, value: Variant) -> void:
+    if settings_data:
+        match key:
+            "music_volume": settings_data.music_volume = value
+            "sfx_volume": settings_data.sfx_volume = value
+            "use_tilt_controls": settings_data.use_tilt_controls = value
+            "tilt_sensitivity": settings_data.tilt_sensitivity = value
+            "text_scale": settings_data.text_scale = value
+            "high_contrast": settings_data.high_contrast = value
+            "reduce_motion": settings_data.reduce_motion = value
+        save_game()  # Auto-save settings
+
+func export_save_json() -> String:
+    var data = {}
+    if player_data:
+        data["player"] = player_data.to_dict()
+    data["settings"] = settings_data.to_dict()
+    return JSON.stringify(data)
+
+func import_save_json(json: String) -> void:
+    var json_parser = JSON.new()
+    var error = json_parser.parse(json)
+    if error != OK:
+        push_error("Failed to parse imported save: " + json_parser.get_error_message())
+        return
+
+    var data = json_parser.get_data()
+    if data.has("player"):
+        player_data = PlayerData.new()
+        player_data.from_dict(data.player)
+    if data.has("settings"):
+        settings_data.from_dict(data.settings)
+    save_game()

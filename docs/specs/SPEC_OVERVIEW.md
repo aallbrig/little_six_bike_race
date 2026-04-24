@@ -2,7 +2,7 @@
 
 **Version:** 1.0  
 **Status:** Implementation-Ready  
-**Last Updated:** 2026-04-10  
+**Last Updated:** 2026-04-24  
 
 This document is the index of all implementation specs. Each spec contains numbered requirements, data structures, Godot scene/node hierarchies, signal interfaces, and acceptance criteria. An implementing agent should work through specs in the order listed below.
 
@@ -34,8 +34,8 @@ Use this table to track implementation progress:
 
 | Spec | Status | Notes |
 |---|---|---|
-| 001 — Project Structure | Not started | |
-| 002 — Attract Mode | Not started | |
+| 001 — Project Structure | Complete | All autoloads, data classes, and core structure implemented |
+| 002 — Attract Mode | Complete | Logo, Cinematic, Title, Demo scenes with iris transitions and loop |
 | 003 — Training System | Not started | |
 | 004 — Multiplayer Race | Not started | |
 | 005 — Networking | Not started | |
@@ -44,7 +44,7 @@ Use this table to track implementation progress:
 | 008 — Audio System | Not started | |
 | 009 — Progression | Not started | |
 | 010 — Race Physics | Not started | |
-| 011 — Static Website | Not started | |
+| 011 — Static Website | Complete | Marketing site with game host, mobile responsive, assets placeholders |
 
 ---
 

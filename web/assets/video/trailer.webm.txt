@@ -1,0 +1,3 @@
+# Placeholder for trailer.webm
+# VP9 encoded WebM video, ~10 seconds
+# Fallback trailer for browsers that prefer WebM

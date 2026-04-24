@@ -16,6 +16,20 @@ The game simulates the full spirit of the Little 500: standardized coaster-brake
 - **Mobile-First** — Designed for phone browsers; tilt/touch controls; portrait lobby, landscape racing
 - **Attract Mode Loop** — Logo → Cinematic → Title Screen → Demo Race → repeat
 
+## Current Status
+
+Little Six is in active development with spec-driven implementation. Core project structure, attract mode, and marketing website are complete and playable.
+
+### Completed Specs
+- **Spec 001** — Godot Project Structure: All autoloads, data classes, and core architecture implemented
+- **Spec 002** — Attract Mode & Game Flow: Logo, cinematic, title screen, demo race with iris transitions
+- **Spec 011** — Static Marketing Website: Bootstrap 5 site with game host, mobile responsive design
+
+### Next Priorities
+- Spec 003 — Training System (Tamagotchi mechanics)
+- Spec 007 — Mobile UI/UX (touch controls, responsive layouts)
+- Spec 004 — Multiplayer Race (core racing mechanics)
+
 ## Documentation
 
 | Document | Description |
@@ -69,18 +83,38 @@ little_six_bike_race/
 
 ## Quick Start (Development)
 
+### Prerequisites
+- Godot 4.6
+- Node.js 20+
+- Docker (for LocalStack)
+
+### Using JetBrains IDE Run Configurations (Recommended)
+If using Rider or IntelliJ IDEA 2026.1+, open the project and use the pre-configured run configurations:
+- **Full Local Dev Stack**: Launches LocalStack, matchmaking server, and web dev server simultaneously
+- **Godot Editor**: Opens the Godot project editor
+- **Matchmaking Dev**: Runs the Node.js matchmaking server
+- **LocalStack**: Starts AWS LocalStack for local DynamoDB/Lambda testing
+- **Website Dev Server**: Serves the static marketing site
+
+### Manual Setup
 ```bash
 # Open the Godot project
-# 1. Install Godot 4.6
-# 2. Open godot/LittleSix/project.godot
+godot --path godot/LittleSix --editor
 
-# Start the local dev server (matchmaking)
+# Start LocalStack
+docker compose -f infra/localstack/docker-compose.yml up
+
+# Start the matchmaking dev server
 cd infra/matchmaking
 npm install
 npm run dev
 
+# Serve the website (in another terminal)
+cd web
+python3 -m http.server 8080
+
 # Run game server locally
-./godot_headless --headless --path godot/LittleSix
+godot --path godot/LittleSix --headless
 ```
 
 ## Implementation Roadmap

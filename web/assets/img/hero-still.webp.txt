@@ -1,0 +1,3 @@
+# Placeholder for hero-still.webp
+# This should be a 1920x1080 webp image of the game track
+# Replace this file with actual image asset

@@ -66,7 +66,7 @@ func stop_music(fade_time: float = 0.5) -> void:
     _music_a.stop()
     _music_b.stop()
 
-func play_sfx(sfx_id: String) -> void:
+func play_sfx(sfx_id: String, bus: String = "SFX") -> void:
     var sfx_path = SFX_CATALOG.get(sfx_id)
     if not sfx_path:
         push_error("SFX not found in catalog: " + sfx_id)

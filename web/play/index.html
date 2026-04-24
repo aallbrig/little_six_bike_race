@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Little Six — Play</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preload" as="fetch" href="/game/little_six.wasm" crossorigin>
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+    <main id="game-root">
+        <canvas id="godot-canvas" tabindex="0"></canvas>
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Warming up the oval...</p>
+        </div>
+        <button id="exit-button" class="exit-affordance" aria-label="Exit to home">←</button>
+        <div id="orientation-hint" hidden>
+            <p>Rotate your phone sideways to race!</p>
+        </div>
+    </main>
+    <script src="/game/little_six.js"></script>
+    <script type="module" src="/assets/js/play-host.js"></script>
+</body>
+</html>

@@ -11,33 +11,68 @@ func _ready() -> void:
     _transition_overlay.color = Color(0, 0, 0, 1)
     _transition_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 
-    # Add simple black material for now
-    _transition_overlay.material = null
+    # Create iris wipe shader material
+    var shader = Shader.new()
+    shader.code = """
+    shader_type canvas_item;
+
+    uniform float progress : hint_range(0.0, 1.0) = 0.0;
+    uniform bool reverse = false;
+
+    void fragment() {
+        vec2 center = vec2(0.5, 0.5);
+        vec2 uv = UV;
+        float dist = distance(uv, center);
+
+        float radius = reverse ? (1.0 - progress) : progress;
+        float alpha = smoothstep(radius - 0.01, radius + 0.01, dist);
+
+        COLOR = vec4(0.0, 0.0, 0.0, alpha);
+    }
+    """
+    var material = ShaderMaterial.new()
+    material.shader = shader
+    material.set_shader_parameter("progress", 0.0)
+    material.set_shader_parameter("reverse", false)
+
+    _transition_overlay.material = material
 
     # Add to root so it stays on top
     get_tree().root.add_child(_transition_overlay)
     _transition_overlay.z_index = 1000
     _transition_overlay.visible = false
 
-# Transition out (fade out)
+# Transition out (iris closes)
 func transition_out(callback: Callable, duration: float = 0.3) -> void:
     if _is_transitioning:
         return
     _is_transitioning = true
     _transition_overlay.visible = true
 
+    var material = _transition_overlay.material as ShaderMaterial
+    material.set_shader_parameter("reverse", false)
+    material.set_shader_parameter("progress", 0.0)
+
     var tween: Tween = create_tween()
-    tween.tween_property(_transition_overlay, "modulate:a", 1.0, duration)
+    tween.tween_method(_set_progress, 0.0, 1.0, duration)
     tween.finished.connect(_on_transition_out_finished.bind(callback))
 
-# Transition in (fade in)
+# Transition in (iris opens)
 func transition_in(duration: float = 0.3) -> void:
     if not _transition_overlay.visible:
         return
 
+    var material = _transition_overlay.material as ShaderMaterial
+    material.set_shader_parameter("reverse", true)
+    material.set_shader_parameter("progress", 1.0)
+
     var tween: Tween = create_tween()
-    tween.tween_property(_transition_overlay, "modulate:a", 0.0, duration)
+    tween.tween_method(_set_progress, 1.0, 0.0, duration)
     tween.finished.connect(_on_transition_in_finished)
+
+func _set_progress(value: float) -> void:
+    var material = _transition_overlay.material as ShaderMaterial
+    material.set_shader_parameter("progress", value)
 
 func _on_transition_out_finished(callback: Callable) -> void:
     callback.call()

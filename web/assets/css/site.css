@@ -1,0 +1,98 @@
+/* site.css - Minimal Bootstrap overrides */
+
+body {
+    font-family: 'Nunito', sans-serif;
+}
+
+.display-1, .display-2, .display-3 {
+    font-family: 'Press Start 2P', monospace;
+}
+
+/* Responsive text sizes */
+@media (max-width: 576px) {
+    .display-1-sm { font-size: 2.5rem; }
+    .display-3-sm { font-size: 1.5rem; }
+    .lead-sm { font-size: 1rem; }
+    .btn-sm-lg { font-size: 0.9rem; padding: 0.5rem 1rem; }
+}
+
+/* Custom gradients */
+.bg-gradient-to-br {
+    background: linear-gradient(135deg, var(--bs-dark) 0%, var(--bs-secondary) 100%);
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    color: white;
+}
+
+.exit-affordance {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 24px;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+#orientation-hint {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    z-index: 1000;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* Mobile optimizations for play page */
+#game-root {
+    width: 100vw;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    position: relative;
+}
+
+#godot-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none; /* Prevent scrolling on touch */
+}
+
+/* Improve exit button on mobile */
+@media (max-width: 768px) {
+    .exit-affordance {
+        top: 15px;
+        left: 15px;
+        font-size: 20px;
+        padding: 8px;
+        border-radius: 25px;
+    }
+
+    #orientation-hint {
+        font-size: 18px;
+        padding: 1rem;
+    }
+}

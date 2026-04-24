@@ -1,0 +1,3 @@
+# Placeholder for og-card.png
+# Open Graph card image: 1200x630 PNG
+# Social media preview image
