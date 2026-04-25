@@ -35,13 +35,18 @@ window/handheld/orientation=0
 
 [gui]
 
-theme/custom="res://assets/ui/LittleSixTheme.tres"
-"#TODO:Enablewhenthemeisfixed[gdscript]warnings/enable"=true
-# Relax validation for development
-warnings/unsafe_property_access=0
-warnings/unsafe_method_access=0
-warnings/unsafe_cast=0
-warnings/unsafe_call_argument=0
+# theme/custom="res://assets/ui/LittleSixTheme.tres"  # Disabled until proper fonts are available
+
+[gdscript]
+warnings/enable=true
+warnings/unsafe_property_access=2
+warnings/unsafe_method_access=2
+warnings/unsafe_cast=2
+warnings/unsafe_call_argument=2
+warnings/return_value_discarded=1
+
+# Enable strict typing
+type_hints/enable=true
 
 [input]
 

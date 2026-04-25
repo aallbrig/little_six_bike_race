@@ -21,8 +21,8 @@ var _rotate_overlay: CanvasLayer
 var _error_banner: HBoxContainer
 
 var current_state: GameState = GameState.LOGO
-var current_player = null  # PlayerData
-var current_season = null  # SeasonData
+var current_player: PlayerData = null
+var current_season: SeasonData = null
 
 func _ready() -> void:
     # Connect to EventBus for race events
