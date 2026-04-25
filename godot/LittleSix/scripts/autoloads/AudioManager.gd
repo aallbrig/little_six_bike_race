@@ -95,11 +95,11 @@ func play_music(track_id: String, fade_time: float = 1.0) -> void:
         tween.tween_callback(active_player.stop)
         tween.tween_property(inactive_player, "volume_db", linear_to_db(_music_volume), fade_time)
 
-func stop_music(fade_time: float = 0.5) -> void:
+func stop_music(_fade_time: float = 0.5) -> void:
     _music_a.stop()
     _music_b.stop()
 
-func play_sfx(sfx_id: String, bus: String = "SFX") -> void:
+func play_sfx(sfx_id: String, _bus: String = "SFX") -> void:
     var sfx_path = SFX_CATALOG.get(sfx_id)
     if not sfx_path:
         print("AudioManager: SFX not found in catalog: " + sfx_id)
@@ -177,7 +177,7 @@ func _on_sfx_requested(sfx_id: String, position: Vector3) -> void:
 func _on_race_started() -> void:
     play_sfx("race_start")
 
-func _on_lap_completed(racer_id: int, lap_number: int, lap_time: float) -> void:
+func _on_lap_completed(_racer_id: int, lap_number: int, _lap_time: float) -> void:
     if lap_number == 49:  # Final lap
         play_sfx("bell_lap")
     else:
@@ -206,13 +206,13 @@ func _on_bell_lap_triggered() -> void:
     play_sfx("bell_lap")
 
 # Training event handlers
-func _on_training_activity_chosen(activity: TrainingActivity.Type, slot: int) -> void:
+func _on_training_activity_chosen(_activity: TrainingActivity.Type, _slot: int) -> void:
     play_sfx("activity_selected")
 
-func _on_training_activity_resolved(activity: TrainingActivity.Type, changes: Dictionary) -> void:
+func _on_training_activity_resolved(_activity: TrainingActivity.Type, _changes: Dictionary) -> void:
     play_sfx("training_complete")
 
-func _on_fatigue_threshold_crossed(old_level: String, new_level: String) -> void:
+func _on_fatigue_threshold_crossed(_old_level: String, new_level: String) -> void:
     if new_level == "TIRED" or new_level == "OVERLOADED":
         play_sfx("fatigue_warning")
 

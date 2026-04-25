@@ -168,11 +168,11 @@ func _on_sprint_pressed(pressed: bool) -> void:
     if pressed:
         set_camera_mode(CameraMode.ACTION, 2.0)  # Exciting sprint view
 
-func _on_lap_completed(racer_id: int, lap_number: int, lap_time: float) -> void:
+func _on_lap_completed(_racer_id: int, lap_number: int, _lap_time: float) -> void:
     if lap_number >= 45:  # Final laps
         set_camera_mode(CameraMode.CINEMATIC, 3.0)
 
-func _on_race_finished(results: Array) -> void:
+func _on_race_finished(_results: Array) -> void:
     set_camera_mode(CameraMode.CINEMATIC, 8.0)  # Victory celebration
 
 func _on_bell_lap() -> void:

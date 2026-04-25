@@ -1,7 +1,5 @@
-extends Node3D
-class_name RaceEffects
-
 # Manages visual effects for the race (particles, screen effects, etc.)
+extends Node3D
 
 @onready var sprint_trail: GPUParticles3D = $SprintTrail
 @onready var speed_lines: GPUParticles3D = $SpeedLines
@@ -32,11 +30,11 @@ func _on_race_started() -> void:
     # Brief celebration effect
     _play_start_effect()
 
-func _on_race_finished(results: Array) -> void:
+func _on_race_finished(_results: Array) -> void:
     # Victory celebration
     _play_finish_effect()
 
-func _on_crash_occurred(racer_id: int) -> void:
+func _on_crash_occurred(_racer_id: int) -> void:
     # Crash sparks/debris
     _play_crash_effect()
 

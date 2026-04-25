@@ -69,21 +69,10 @@ func _update_ui() -> void:
     $ConfirmButton.disabled = TrainingManager.selected_activities.is_empty()
 
 func _on_activity_selected(index: int) -> void:
-    var activity_types = [
-        TrainingActivity.SPRINT_INTERVALS,
-        TrainingActivity.LONG_RIDE,
-        TrainingActivity.STRENGTH_WORK,
-        TrainingActivity.VIDEO_STUDY,
-        TrainingActivity.TEAM_MEETING,
-        TrainingActivity.NUTRITION_PLAN,
-        TrainingActivity.RECOVERY_SPIN,
-        TrainingActivity.REST_DAY
-    ]
-
     var activity = activity_types[index]
-    var slot = TrainingManager.selected_activities.size()
+    var _slot = TrainingManager.selected_activities.size()
 
-    if TrainingManager.select_activity(activity, slot):
+    if TrainingManager.select_activity(activity, _slot):
         # Visual feedback - clear all selections first
         for card in activity_buttons:
             card.is_selected = false

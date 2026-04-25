@@ -69,7 +69,7 @@ func _on_next_pressed() -> void:
 func _on_skip_pressed() -> void:
     complete_tutorial()
 
-func _on_activity_chosen(activity: int, slot: int) -> void:
+func _on_activity_chosen(_activity: int, _slot: int) -> void:
     # If player has chosen activities, advance tutorial
     if current_step < TUTORIAL_STEPS.size() - 1:
         current_step = TUTORIAL_STEPS.size() - 1
