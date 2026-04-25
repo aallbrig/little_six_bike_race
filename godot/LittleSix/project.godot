@@ -15,7 +15,7 @@ config/description="A multiplayer cycling race game inspired by the Little 500 t
 config/version="0.1.0"
 run/main_scene="res://scenes/logo/Logo.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
-config/icon="res://assets/ui/icon.png"
+# config/icon="res://assets/ui/icon.png"  # TODO: Add proper game icon
 
 [audio]
 
@@ -26,7 +26,7 @@ buses/default_bus_layout="res://audio_bus_layout.tres"
 EventBus="*res://scripts/autoloads/EventBus.gd"
 SaveManager="*res://scripts/autoloads/SaveManager.gd"
 AudioManager="*res://scripts/autoloads/AudioManager.gd"
-NetworkManager="*res://scripts/network/NetworkManager.gd"
+NetworkMgr="*res://scripts/network/NetworkManager.gd"
 HostBridge="*res://scripts/autoloads/HostBridge.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
 TransitionManager="*res://scripts/autoloads/TransitionManager.gd"

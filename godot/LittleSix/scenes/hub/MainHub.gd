@@ -10,7 +10,7 @@ func _on_train_pressed() -> void:
 
 func _on_race_pressed() -> void:
     # Use NetworkManager for matchmaking
-    if NetworkManager.find_match("quick"):
+    if NetworkMgr.find_match("quick"):
         print("Finding match...")
         # Transition will happen when match is found
     else:

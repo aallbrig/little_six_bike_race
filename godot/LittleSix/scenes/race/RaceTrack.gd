@@ -3,11 +3,16 @@ extends Node3D
 var riders = []
 var race_controller
 
+# Force script reload
+
 func _ready() -> void:
     # Create race controller
     var RaceControllerScript = load("res://scripts/race/RaceController.gd")
     race_controller = RaceControllerScript.new()
     add_child(race_controller)
+
+    # Create race event controllers
+    _create_event_controllers()
 
     # Spawn 6 riders (1 player, 5 AI)
     _spawn_riders()
@@ -17,6 +22,38 @@ func _ready() -> void:
 
     EventBus.race_started.connect(_on_race_started)
     EventBus.lap_completed.connect(_on_lap_completed)
+
+func _create_event_controllers() -> void:
+    """Create and attach race event controllers"""
+    var qualifying_script = load("res://scripts/race/QualifyingController.gd")
+    var qualifying = Node.new()
+    qualifying.set_script(qualifying_script)
+    qualifying.name = "QualifyingController"
+    add_child(qualifying)
+
+    var miss_n_out_script = load("res://scripts/race/MissNOutController.gd")
+    var miss_n_out = Node.new()
+    miss_n_out.set_script(miss_n_out_script)
+    miss_n_out.name = "MissNOutController"
+    add_child(miss_n_out)
+
+    var team_pursuit_script = load("res://scripts/race/TeamPursuitController.gd")
+    var team_pursuit = Node.new()
+    team_pursuit.set_script(team_pursuit_script)
+    team_pursuit.name = "TeamPursuitController"
+    add_child(team_pursuit)
+
+    var starting_grid_script = load("res://scripts/race/StartingGridController.gd")
+    var starting_grid = Node.new()
+    starting_grid.set_script(starting_grid_script)
+    starting_grid.name = "StartingGridController"
+    add_child(starting_grid)
+
+    var collision_script = load("res://scripts/race/CollisionController.gd")
+    var collision = Node.new()
+    collision.set_script(collision_script)
+    collision.name = "CollisionController"
+    add_child(collision)
 
 func _spawn_riders() -> void:
     var rider_scene = load("res://scenes/race/Rider.tscn")

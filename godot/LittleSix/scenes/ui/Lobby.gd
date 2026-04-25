@@ -26,8 +26,8 @@ var _is_host: bool = false
 
 func _ready() -> void:
 	# Connect to network events
-	NetworkManager.lobby_state_changed.connect(_on_lobby_state_changed)
-	NetworkManager.race_starting.connect(_on_race_starting)
+	NetworkMgr.lobby_state_changed.connect(_on_lobby_state_changed)
+	NetworkMgr.race_starting.connect(_on_race_starting)
 
 	# Initialize player slots
 	for slot in player_slots:
@@ -99,21 +99,21 @@ func _on_race_starting(lobby_id: String, race_config: Dictionary) -> void:
 func _on_ready_pressed() -> void:
 	"""Toggle ready state"""
 	_is_ready = not _is_ready
-	NetworkManager.set_player_ready(_is_ready)
+	NetworkMgr.set_player_ready(_is_ready)
 
 	# Update button text immediately for responsiveness
 	ready_button.text = "READY" if not _is_ready else "NOT READY"
 
 func _on_leave_pressed() -> void:
 	"""Leave the lobby"""
-	NetworkManager.leave_lobby()
+	NetworkMgr.leave_lobby()
 	hide()
 	# Return to main menu
 
 func _on_start_pressed() -> void:
 	"""Start the race (host only)"""
 	if _is_host:
-		NetworkManager.start_race()
+		NetworkMgr.start_race()
 
 func show_lobby(lobby_data: Dictionary) -> void:
 	"""Show the lobby with initial data"""

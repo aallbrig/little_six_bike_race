@@ -37,8 +37,8 @@ func _ready() -> void:
 
     _transition_overlay.material = material
 
-    # Add to root so it stays on top
-    get_tree().root.add_child(_transition_overlay)
+    # Add to root so it stays on top (deferred to avoid setup conflicts)
+    get_tree().root.call_deferred("add_child", _transition_overlay)
     _transition_overlay.z_index = 1000
     _transition_overlay.visible = false
 

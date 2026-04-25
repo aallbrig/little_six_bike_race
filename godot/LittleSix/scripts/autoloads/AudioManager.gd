@@ -76,8 +76,13 @@ func play_music(track_id: String, fade_time: float = 1.0) -> void:
 	var track_path = "res://assets/audio/music/" + track_id + ".ogg"
 	var stream = load(track_path)
 	if not stream:
-		# Silent fallback for missing assets during development
-		print("AudioManager: Missing music file: ", track_path)
+		# Silent fallback for missing/empty assets during development
+		print("AudioManager: Missing or invalid music file: ", track_path)
+		return
+
+	# Check if stream is valid (not empty/corrupted)
+	if not stream is AudioStream:
+		print("AudioManager: Invalid audio stream for: ", track_path)
 		return
 
 	# Crossfade between music layers A/B
