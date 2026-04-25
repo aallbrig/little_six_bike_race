@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://run-tests-scene"]
+
+[ext_resource type="PackedScene" path="res://addons/gut/gui/GutControl.tscn" id="1"]
+[ext_resource type="Script" path="res://test/TestRunner.gd" id="2"]
+
+[node name="TestRunner" type="Node2D"]
+script = ExtResource("2")
+
+[node name="GutControl" parent="." instance=ExtResource("1")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+bg_color = Color(0.1, 0.1, 0.1, 1)
+
+[connection signal="tests_finished" from="GutControl" to="." method="_on_tests_finished"]

@@ -36,6 +36,10 @@ game: ## Run the Godot game
 	@echo "🎮 Starting Little Six game..."
 	@./scripts/run-godot-game.sh
 
+test: ## Run GUT unit tests
+	@echo "🧪 Running GUT tests..."
+	@./scripts/run-godot-tests.sh
+
 editor: ## Open Godot editor
 	@echo "🎨 Opening Godot editor..."
 	@./scripts/open-godot-editor.sh
