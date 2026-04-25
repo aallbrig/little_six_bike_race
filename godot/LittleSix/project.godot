@@ -47,6 +47,13 @@ warnings/unsafe_method_access=2
 warnings/unsafe_cast=2
 warnings/unsafe_call_argument=2
 warnings/return_value_discarded=1
+warnings/untyped_declaration=2
+warnings/incompatible_ternary=2
+warnings/inference_on_variant=2
+warnings/unsafe_void_return=2
+warnings/unsafe_call_argument=2
+warnings/unsafe_property_access=2
+warnings/unsafe_method_access=2
 
 # Enable strict typing
 type_hints/enable=true

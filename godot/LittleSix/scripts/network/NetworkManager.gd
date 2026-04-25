@@ -21,7 +21,7 @@ enum ConnectionState {
 var _connection_state: ConnectionState = ConnectionState.DISCONNECTED
 var _ws_client: WebSocketClient
 var _matchmaking_api: MatchmakingAPI
-var _server_url: String = "wss://api.littlesix.com/ws"  # Placeholder
+var _server_url: String = "wss://api.littlesix.com/ws"	# Placeholder
 var _auth_token: String = ""
 
 # Race synchronization
@@ -54,7 +54,7 @@ func _initialize_networking() -> void:
 	_matchmaking_api.race_starting.connect(_on_race_starting)
 	_matchmaking_api.matchmaking_error.connect(_on_matchmaking_error)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	"""Poll network state every frame"""
 	if _ws_client:
 		_ws_client.poll()
@@ -89,8 +89,8 @@ func join_lobby(lobby_id: String) -> bool:
 func leave_lobby() -> bool:
 	return _matchmaking_api.leave_lobby()
 
-func set_player_ready(ready: bool) -> bool:
-	return _matchmaking_api.set_player_ready(ready)
+func set_player_ready(is_ready: bool) -> bool:
+	return _matchmaking_api.set_player_ready(is_ready)
 
 func start_race() -> bool:
 	return _matchmaking_api.start_race()
@@ -191,34 +191,34 @@ func _on_server_info(payload: Dictionary) -> void:
 	print("NetworkManager: Connected to server v", server_version, " with features: ", features)
 
 # Matchmaking event handlers
-func _on_lobby_created(lobby_id: String, lobby_data: Dictionary) -> void:
+func _on_lobby_created(_lobby_id: String, lobby_data: Dictionary) -> void:
 	_connection_state = ConnectionState.IN_LOBBY
 	lobby_state_changed.emit(lobby_data)
 
-func _on_lobby_joined(lobby_id: String, lobby_data: Dictionary) -> void:
+func _on_lobby_joined(_lobby_id: String, lobby_data: Dictionary) -> void:
 	_connection_state = ConnectionState.IN_LOBBY
 	lobby_state_changed.emit(lobby_data)
 
 func _on_lobby_updated(lobby_data: Dictionary) -> void:
 	lobby_state_changed.emit(lobby_data)
 
-func _on_lobby_destroyed(lobby_id: String) -> void:
+func _on_lobby_destroyed(_lobby_id: String) -> void:
 	if _connection_state == ConnectionState.IN_LOBBY:
 		_connection_state = ConnectionState.CONNECTED
 
-func _on_player_joined(player_id: String, player_data: Dictionary) -> void:
+func _on_player_joined(_player_id: String, _player_data: Dictionary) -> void:
 	# Update lobby state
 	pass
 
-func _on_player_left(player_id: String) -> void:
+func _on_player_left(_player_id: String) -> void:
 	# Update lobby state
 	pass
 
-func _on_player_ready_changed(player_id: String, ready: bool) -> void:
+func _on_player_ready_changed(_player_id: String, _is_ready: bool) -> void:
 	# Update lobby state
 	pass
 
-func _on_race_starting(lobby_id: String, race_config: Dictionary) -> void:
+func _on_race_starting(_lobby_id: String, race_config: Dictionary) -> void:
 	_connection_state = ConnectionState.IN_RACE
 	print("NetworkManager: Race starting with config: ", race_config)
 

@@ -6,15 +6,15 @@ class_name BikePhysics
 
 # Physical constants
 const MASS = 85.0  # kg (rider + bike)
-const GRAVITY = 9.8  # m/s²
+const GRAVITY = 9.8	 # m/s²
 
 # Game-tuned constants for feel
 const ACCEL = 5.0  # m/s² (pedaling acceleration)
 const COAST_DECEL = 0.05  # m/s² (rolling resistance only)
-const BRAKE_DECEL = 7.0  # m/s² (coaster brake deceleration)
+const BRAKE_DECEL = 7.0	 # m/s² (coaster brake deceleration)
 
 # Aerodynamic constants
-const DRAG_COEFFICIENT = 0.3  # Simplified drag coefficient (F_drag = 0.3 * v²)
+var DRAG_COEFFICIENT: float = 0.3  # Simplified drag coefficient (F_drag = 0.3 * v²)
 
 # Input state
 var is_pedaling: bool = false
