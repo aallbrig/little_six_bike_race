@@ -21,8 +21,8 @@ var _rotate_overlay: CanvasLayer
 var _error_banner: HBoxContainer
 
 var current_state: GameState = GameState.LOGO
-var current_player: PlayerData = null
-var current_season: SeasonData = null
+var current_player = null  # PlayerData
+var current_season = null  # SeasonData
 
 func _ready() -> void:
     # Connect to EventBus for race events
@@ -61,7 +61,7 @@ func get_current_scene() -> Node:
 func _on_scene_loaded(scene: Node) -> void:
     pass  # Override in subclasses if needed
 
-func _on_race_finished(results: Array) -> void:
+func _on_race_finished(results) -> void:
     print("Race finished with ", results.size(), " results")
     transition_to(GameState.RACE_RESULTS, {"results": results})
 

@@ -15,23 +15,15 @@ config/description="A multiplayer cycling race game inspired by the Little 500 t
 config/version="0.1.0"
 run/main_scene="res://scenes/logo/Logo.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
-# config/icon="res://assets/ui/icon.png"  # TODO: Add proper game icon
-
-[audio]
-
-buses/default_bus_layout="res://audio_bus_layout.tres"
+#config/icon="res://assets/ui/icon.png"
+"#TODO:Addpropergameicon[audio]buses/default_bus_layout"="res://audio_bus_layout.tres"
 
 [autoload]
 
 EventBus="*res://scripts/autoloads/EventBus.gd"
-SaveManager="*res://scripts/autoloads/SaveManager.gd"
-AudioManager="*res://scripts/autoloads/AudioManager.gd"
-NetworkMgr="*res://scripts/network/NetworkManager.gd"
 HostBridge="*res://scripts/autoloads/HostBridge.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
 TransitionManager="*res://scripts/autoloads/TransitionManager.gd"
-TrainingManager="*res://scripts/training/TrainingManager.gd"
-EventTelemetryLogger="*res://scripts/autoloads/EventTelemetryLogger.gd"
 
 [display]
 
@@ -45,10 +37,10 @@ window/handheld/orientation=1
 
 #theme/custom="res://assets/ui/LittleSixTheme.tres"
 "#TODO:Enablewhenthemeisfixed[gdscript]warnings/enable"=true
-warnings/unsafe_property_access=2
-warnings/unsafe_method_access=2
-warnings/unsafe_cast=2
-warnings/unsafe_call_argument=2
+warnings/unsafe_property_access=1
+warnings/unsafe_method_access=1
+warnings/unsafe_cast=1
+warnings/unsafe_call_argument=1
 
 [input]
 

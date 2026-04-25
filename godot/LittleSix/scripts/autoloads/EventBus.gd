@@ -1,23 +1,23 @@
 extends Node
 
 # ── Game State ──────────────────────────────────────────
-signal game_state_changed(new_state: GameManager.GameState)
-signal scene_transition_requested(target_scene: String, data: Dictionary)
+signal game_state_changed(new_state)
+signal scene_transition_requested(target_scene, data)
 
 # ── Player / Account ────────────────────────────────────
-signal player_logged_in(player_data: PlayerData)
+signal player_logged_in(player_data)
 signal player_logged_out()
-signal racer_created(racer: RacerData)
-signal racer_stat_changed(stat: String, old_value: int, new_value: int)
+signal racer_created(racer)
+signal racer_stat_changed(stat, old_value, new_value)
 
 # ── Training ─────────────────────────────────────────────
-signal training_day_started(week: int, day: int)
-signal training_activity_chosen(activity: TrainingActivity.Type, slot: int)
-signal training_activity_resolved(activity: TrainingActivity.Type, changes: Dictionary)
-signal training_random_event_fired(event_id: String, effects: Dictionary)
-signal training_day_completed(week: int, day: int, summary: Dictionary)
-signal fatigue_threshold_crossed(old_level: String, new_level: String)
-signal injury_occurred(stat_affected: String, duration_days: int)
+signal training_day_started(week, day)
+signal training_activity_chosen(activity, slot)
+signal training_activity_resolved(activity, changes)
+signal training_random_event_fired(event_id, effects)
+signal training_day_completed(week, day, summary)
+signal fatigue_threshold_crossed(old_level, new_level)
+signal injury_occurred(stat_affected, duration_days)
 
 # ── Race ──────────────────────────────────────────────────
 # TODO: Uncomment when Spec 004 is implemented
@@ -32,12 +32,12 @@ signal exchange_executed(team_id: int, outgoing_rider: int, incoming_rider: int,
 signal sprint_activated(racer_id: int)
 signal sprint_exhausted(racer_id: int)
 signal crash_occurred(racer_id: int)
-signal riders_position_update(rider_positions: Array)
+signal riders_position_update(rider_positions)
 signal settings_closed()
 signal rider_collision(rider_a_id: int, rider_b_id: int)
-signal wall_collision(racer_id: int, position: Vector3)
+signal wall_collision(racer_id, position)
 signal bell_lap_triggered()
-signal race_finished(results: Array[RaceResult])
+signal race_finished(results: Array)
 # signal race_abandoned()
 
 # ── Networking ────────────────────────────────────────────
@@ -50,12 +50,12 @@ signal race_finished(results: Array[RaceResult])
 # signal latency_updated(ms: int)
 
 # ── Audio ─────────────────────────────────────────────────
-signal music_track_requested(track_id: String, fade_time: float)
-signal sfx_requested(sfx_id: String, position: Vector3)
+signal music_track_requested(track_id, fade_time)
+signal sfx_requested(sfx_id, position)
 
 # ── Host Bridge ───────────────────────────────────────────
-signal host_event_sent(type: String, payload: Dictionary)
-signal host_event_received(type: String, payload: Dictionary)
+signal host_event_sent(type, payload)
+signal host_event_received(type, payload)
 
 # ── Race Input ────────────────────────────────────────────
 signal steer_input_changed(value: float)
