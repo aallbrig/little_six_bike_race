@@ -12,18 +12,18 @@ func _ready() -> void:
 
 func find_match(match_type: String = "quick") -> void:
     print("Finding ", match_type, " match...")
-    
+
     # For local testing, simulate successful matchmaking response
     # In production this would call AWS Lambda
     await get_tree().create_timer(1.5).timeout
-    
+
     var simulated_response = {
         "server_url": "ws://localhost:8081/room/test123",
         "room_id": "test123",
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulatedtoken",
         "estimated_wait": 8
     }
-    
+
     _on_matchmaking_response(200, 0, PackedStringArray(), JSON.stringify(simulated_response).to_utf8_buffer())
 
 func _on_matchmaking_response(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray) -> void:

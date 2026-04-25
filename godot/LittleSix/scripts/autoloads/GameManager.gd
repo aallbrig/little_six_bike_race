@@ -17,6 +17,8 @@ enum GameState {
 }
 
 var _loading_overlay: CanvasLayer
+var _rotate_overlay: CanvasLayer
+var _error_banner: HBoxContainer
 
 var current_state: GameState = GameState.LOGO
 var current_player: PlayerData = null
@@ -31,6 +33,16 @@ func _ready() -> void:
     _loading_overlay = preload("res://scenes/ui/LoadingOverlay.tscn").instantiate()
     get_tree().root.call_deferred("add_child", _loading_overlay)
     _loading_overlay.call_deferred("hide_loading")
+
+    # Initialize rotate overlay
+    _rotate_overlay = preload("res://scenes/ui/RotateOverlay.tscn").instantiate()
+    get_tree().root.call_deferred("add_child", _rotate_overlay)
+    _rotate_overlay.call_deferred("hide_overlay")
+
+    # Initialize error banner
+    _error_banner = preload("res://scenes/ui/components/ErrorBanner.tscn").instantiate()
+    get_tree().root.call_deferred("add_child", _error_banner)
+    _error_banner.call_deferred("hide_error")
 
 func transition_to(state: GameState, data: Dictionary = {}) -> void:
     if state == current_state:
@@ -82,15 +94,18 @@ func _enter_state(state: GameState, data: Dictionary) -> void:
             push_error("Unknown game state: " + str(state))
 
 func _update_orientation_for_state(state: GameState) -> void:
-    # Orientation locking is handled by the rotate overlay and host page
-    # For now, just ensure we're in the right mode when entering race
     match state:
         GameState.RACE_ACTIVE:
             # Request landscape via host bridge for mobile web
             HostBridge.emit_to_host("orientation_request", { "orientation": "landscape" })
+            # Show rotate overlay if orientation lock fails
+            _rotate_overlay.set_target_orientation(DisplayServer.SCREEN_LANDSCAPE)
+            _rotate_overlay.show_overlay()
         _:
             # Portrait for all other states
             HostBridge.emit_to_host("orientation_request", { "orientation": "portrait" })
+            # Hide rotate overlay
+            _rotate_overlay.hide_overlay()
 
 func _exit_state(state: GameState) -> void:
     # Clean up state-specific resources if needed
@@ -110,6 +125,19 @@ func show_loading(message: String = "") -> void:
 
 func hide_loading() -> void:
     _loading_overlay.hide_loading()
+
+func show_rotate_overlay(target_orientation: int = DisplayServer.SCREEN_LANDSCAPE) -> void:
+    _rotate_overlay.set_target_orientation(target_orientation)
+    _rotate_overlay.show_overlay()
+
+func hide_rotate_overlay() -> void:
+    _rotate_overlay.hide_overlay()
+
+func show_error(message: String, can_retry: bool = false) -> void:
+    _error_banner.show_error(message, can_retry)
+
+func hide_error() -> void:
+    _error_banner.hide_error()
 
 func quit_to_host(reason: String = "player_exit") -> void:
     HostBridge.emit_to_host("quit", { "reason": reason })

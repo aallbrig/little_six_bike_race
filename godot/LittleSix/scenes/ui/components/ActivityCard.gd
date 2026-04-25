@@ -2,14 +2,7 @@ extends PanelContainer
 
 signal card_tapped(activity_type: int)
 
-enum ActivityType {
-	REST,
-	LIGHT_TRAINING,
-	HARD_TRAINING,
-	RECOVERY
-}
-
-@export var activity_type: ActivityType = ActivityType.REST:
+@export var activity_type: int = TrainingActivity.Type.SPRINT_INTERVALS:
 	set(value):
 		activity_type = value
 		_update_display()
@@ -33,19 +26,21 @@ func _on_gui_input(event: InputEvent) -> void:
 		card_tapped.emit(activity_type)
 
 func _update_display() -> void:
-	match activity_type:
-		ActivityType.REST:
-			$VBoxContainer/NameLabel.text = "REST"
-			$VBoxContainer/EffectLabel.text = "-Fatigue"
-		ActivityType.LIGHT_TRAINING:
-			$VBoxContainer/NameLabel.text = "LIGHT TRAINING"
-			$VBoxContainer/EffectLabel.text = "+Speed -Fatigue"
-		ActivityType.HARD_TRAINING:
-			$VBoxContainer/NameLabel.text = "HARD TRAINING"
-			$VBoxContainer/EffectLabel.text = "++Speed +Fatigue"
-		ActivityType.RECOVERY:
-			$VBoxContainer/NameLabel.text = "RECOVERY"
-			$VBoxContainer/EffectLabel.text = "+Fatigue Recovery"
+	var name = TrainingActivity.get_activity_name(activity_type)
+	var effects = TrainingActivity.EFFECTS.get(activity_type, {})
+	var effect_text = ""
+	for stat in effects:
+		if stat != "fatigue":
+			var change = effects[stat]
+			var sign = "+" if change > 0 else ""
+			effect_text += sign + stat.capitalize() + " "
+		if stat == "fatigue":
+			var change = effects[stat]
+			var sign = "+" if change > 0 else ""
+			effect_text += sign + str(change) + " Fatigue"
+
+	$VBoxContainer/NameLabel.text = name
+	$VBoxContainer/EffectLabel.text = effect_text.strip_edges()
 
 func _update_border() -> void:
 	if is_selected:

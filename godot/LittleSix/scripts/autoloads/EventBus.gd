@@ -32,6 +32,8 @@ signal exchange_executed(team_id: int, outgoing_rider: int, incoming_rider: int,
 signal sprint_activated(racer_id: int)
 signal sprint_exhausted(racer_id: int)
 signal crash_occurred(racer_id: int)
+signal riders_position_update(rider_positions: Array)
+signal settings_closed()
 signal bell_lap_triggered()
 signal race_finished(results: Array[RaceResult])
 # signal race_abandoned()

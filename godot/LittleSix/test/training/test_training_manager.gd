@@ -15,10 +15,10 @@ func after_each():
 func test_training_day_started_signal_emitted():
     # Given: TrainingManager is initialized
     watch_signals(EventBus)
-    
+
     # When: Training day is started (this happens automatically in _ready)
     await get_tree().create_timer(0.1).wait
-    
+
     # Then: Should emit training_day_started signal
     assert_signal_emitted(EventBus, "training_day_started", "TrainingManager should emit day started signal")
 

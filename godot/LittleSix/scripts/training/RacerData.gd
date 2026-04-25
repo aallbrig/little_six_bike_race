@@ -28,37 +28,75 @@ func get_race_form() -> String:
     else:
         return "HOT"
 
-func apply_training(activity: TrainingActivity.Type) -> Dictionary:
+func apply_training(activity: TrainingActivity.Type, fatigue_multiplier: float = 1.0) -> Dictionary:
     # Returns dict of stat changes
     var changes = {}
     var effects = TrainingActivity.EFFECTS.get(activity, {})
 
     for stat in effects:
-        var change = effects[stat]
+        var base_change = effects[stat]
+        var effective_change = base_change
+
+        # Apply fatigue multiplier only to positive gains, not fatigue cost
+        if stat != "fatigue" and base_change > 0:
+            effective_change = round(base_change * fatigue_multiplier)
+
+        # Apply soft cap: gains above 85 are halved, above 90 are quartered
+        var current_value = get(stat)
+        if stat in ["speed", "endurance", "recovery", "handling", "team_chem"]:
+            if current_value >= 85 and effective_change > 0:
+                var over_soft_cap = max(0, current_value + effective_change - 85)
+                effective_change = max(0, effective_change - over_soft_cap / 2)
+            if current_value >= 90 and effective_change > 0:
+                var over_hard_cap = max(0, current_value + effective_change - 90)
+                effective_change = max(0, effective_change - over_hard_cap * 3 / 4)
+
+        # Apply the change
         match stat:
             "speed":
-                speed = clamp(speed + change, 0, 100)
-                changes[stat] = change
+                speed = clamp(speed + effective_change, 0, 100)
+                changes[stat] = effective_change
             "endurance":
-                endurance = clamp(endurance + change, 0, 100)
-                changes[stat] = change
+                endurance = clamp(endurance + effective_change, 0, 100)
+                changes[stat] = effective_change
             "recovery":
-                recovery = clamp(recovery + change, 0, 100)
-                changes[stat] = change
+                recovery = clamp(recovery + effective_change, 0, 100)
+                changes[stat] = effective_change
             "handling":
-                handling = clamp(handling + change, 0, 100)
-                changes[stat] = change
+                handling = clamp(handling + effective_change, 0, 100)
+                changes[stat] = effective_change
             "team_chem":
-                team_chem = clamp(team_chem + change, 0, 100)
-                changes[stat] = change
+                team_chem = clamp(team_chem + effective_change, 0, 100)
+                changes[stat] = effective_change
             "fatigue":
-                fatigue = clamp(fatigue + change, 0, 100)
-                changes[stat] = change
+                fatigue = clamp(fatigue + effective_change, 0, 100)
+                changes[stat] = effective_change
             "morale":
-                morale = clamp(morale + change, 0, 100)
-                changes[stat] = change
+                morale = clamp(morale + effective_change, 0, 100)
+                changes[stat] = effective_change
 
     return changes
+
+func apply_stat_change(stat_name: String, delta: int) -> void:
+    match stat_name:
+        "speed":
+            speed = clamp(speed + delta, 0, 100)
+        "endurance":
+            endurance = clamp(endurance + delta, 0, 100)
+        "recovery":
+            recovery = clamp(recovery + delta, 0, 100)
+        "handling":
+            handling = clamp(handling + delta, 0, 100)
+        "team_chem":
+            team_chem = clamp(team_chem + delta, 0, 100)
+
+func apply_injury(affected_stat: String, penalty: int, days: int) -> void:
+    is_injured = true
+    injury_days_remaining = days
+    # Store the penalty for healing later
+    set_meta("injury_stat", affected_stat)
+    set_meta("injury_penalty", penalty)
+    apply_stat_change(affected_stat, -penalty)
 
 func to_dict() -> Dictionary:
     return {

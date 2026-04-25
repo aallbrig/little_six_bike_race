@@ -4,13 +4,13 @@ func _ready() -> void:
     # Start pulsing animation for "TAP TO START"
     $PulseTimer.timeout.connect(_on_pulse_timer_timeout)
     $IdleTimer.timeout.connect(_on_idle_timer_timeout)
-    
+
     # Initial pulse
     _pulse_tap_label()
-    
+
     # Connect input for any tap
     gui_input.connect(_on_gui_input)
-    
+
     # Start music
     EventBus.music_track_requested.emit("attract", 0.5)
 

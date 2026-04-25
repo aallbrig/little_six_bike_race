@@ -27,7 +27,7 @@ func _ready() -> void:
     # Setup collision
     collision_layer = 1
     collision_mask = 1
-    
+
     # Create draft detector
     draft_detector = Area3D.new()
     var collision_shape = CollisionShape3D.new()
@@ -44,30 +44,30 @@ func _physics_process(delta: float) -> void:
     var pedal_force = 0.0
     if is_pedaling and not is_braking:
         pedal_force = MASS * ACCEL
-    
+
     var drag = 0.3 * current_speed * current_speed
     if is_drafting:
         drag *= (1.0 - DRAFT_BONUS)
-    
+
     var rolling_resistance = MASS * 9.8 * 0.005  # μ_r = 0.005 for cinder
-    
+
     var brake_force = 0.0
     if is_braking:
         brake_force = MASS * 9.8 * 0.7  # μ_b = 0.7 for coaster brake
-    
+
     # Net force
     var net_force = pedal_force - drag - rolling_resistance - brake_force
-    
+
     # Update velocity
     var acceleration = net_force / MASS
     current_speed = clamp(current_speed + acceleration * delta, 0.0, MAX_SPEED)
-    
+
     # Apply movement
     if is_ai:
         _ai_steering(delta)
     else:
         _player_steering(delta)
-    
+
     # Sprint energy management
     if is_sprinting:
         sprint_energy = max(0.0, sprint_energy - 25.0 * delta)
@@ -76,10 +76,10 @@ func _physics_process(delta: float) -> void:
             EventBus.sprint_exhausted.emit(racer_id)
     elif sprint_energy < 100.0:
         sprint_energy = min(100.0, sprint_energy + 15.0 * delta)
-    
+
     # Update track progress (simplified)
     track_progress = fmod(track_progress + (current_speed * delta * 0.01), 1.0)
-    
+
     # Emit position updates for networking
     if not is_ai:
         EventBus.racer_position_changed.emit(racer_id, int(track_progress * 100))
@@ -91,9 +91,9 @@ func _player_steering(delta: float) -> void:
         turn = -1.0
     elif Input.is_action_pressed("steer_right"):
         turn = 1.0
-    
+
     rotate_y(turn * 2.0 * delta)
-    
+
     # Forward movement along facing direction
     var direction = -transform.basis.z
     velocity = direction * current_speed
@@ -103,7 +103,7 @@ func _ai_steering(delta: float) -> void:
     # AI follows simple path with some randomness
     var target_speed = MAX_SPEED * 0.85
     current_speed = lerp(current_speed, target_speed, 0.1)
-    
+
     # Simple AI steering - would use PathFollow3D in full implementation
     velocity = -transform.basis.z * current_speed
     move_and_slide()

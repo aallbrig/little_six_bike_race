@@ -8,7 +8,7 @@ var selected_jersey = 0
 func _ready() -> void:
     $BackButton.pressed.connect(_on_back_pressed)
     $Content/BeginButton.pressed.connect(_on_begin_pressed)
-    
+
     # For demo purposes, auto-complete after a delay
     await get_tree().create_timer(3.0).timeout
     _complete_creation()
@@ -28,9 +28,9 @@ func _complete_creation() -> void:
     player.racer = RacerData.new()
     player.racer.name = racer_name
     player.current_season = SeasonData.new()
-    
+
     SaveManager.player_data = player
     SaveManager.save_game()
-    
+
     # Transition to main hub
     GameManager.transition_to(GameManager.GameState.MAIN_HUB)

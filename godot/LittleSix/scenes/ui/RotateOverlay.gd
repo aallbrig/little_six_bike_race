@@ -1,25 +1,47 @@
 extends CanvasLayer
+class_name RotateOverlay
+
+# Overlay that appears when race requires landscape but device is in portrait
+
+var _target_orientation = DisplayServer.SCREEN_LANDSCAPE
+var _check_timer: Timer
 
 func _ready() -> void:
-	visible = false
-	_check_orientation()
+	# Create timer to check orientation periodically
+	_check_timer = Timer.new()
+	_check_timer.wait_time = 0.5
+	_check_timer.timeout.connect(_check_orientation)
+	add_child(_check_timer)
+	_check_timer.start()
 
-func _process(_delta: float) -> void:
+	# Initial orientation check
 	_check_orientation()
 
 func _check_orientation() -> void:
-	var screen_size = DisplayServer.window_get_size()
-	var is_portrait = screen_size.y > screen_size.x
+	var current_orientation = DisplayServer.screen_get_orientation()
 
-	# Show overlay if in portrait mode during race
-	var should_show = is_portrait and GameManager.current_state == GameManager.GameState.RACE_ACTIVE
+	# Hide overlay if we're in the correct orientation
+	if _target_orientation == DisplayServer.SCREEN_LANDSCAPE:
+		if current_orientation == DisplayServer.SCREEN_LANDSCAPE or \
+		   current_orientation == DisplayServer.SCREEN_LANDSCAPE_FLIPPED:
+			hide_overlay()
+	elif _target_orientation == DisplayServer.SCREEN_PORTRAIT:
+		if current_orientation == DisplayServer.SCREEN_PORTRAIT or \
+		   current_orientation == DisplayServer.SCREEN_PORTRAIT_FLIPPED:
+			hide_overlay()
 
-	if visible != should_show:
-		visible = should_show
-		if should_show:
-			_try_lock_orientation()
+func set_target_orientation(orientation: int) -> void:
+	_target_orientation = orientation
+	_check_orientation()  # Immediate check
 
-func _try_lock_orientation() -> void:
-	# Try to lock to landscape for race
-	if DisplayServer.has_feature(DisplayServer.FEATURE_SCREEN_ORIENTATION):
-		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_LANDSCAPE)
+func show_overlay() -> void:
+	show()
+	_check_timer.start()
+
+func hide_overlay() -> void:
+	hide()
+	_check_timer.stop()
+
+func _exit_tree() -> void:
+	if _check_timer:
+		_check_timer.stop()

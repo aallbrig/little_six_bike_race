@@ -8,12 +8,16 @@ var sprint_energy = 85.0
 var in_exchange_zone = false
 
 func _ready() -> void:
+    # Apply safe area handling for mobile devices
+    _apply_safe_area_margins()
+
     EventBus.lap_completed.connect(_on_lap_completed)
     EventBus.racer_position_changed.connect(_on_position_changed)
     EventBus.sprint_activated.connect(_on_sprint_activated)
     EventBus.sprint_exhausted.connect(_on_sprint_exhausted)
     EventBus.pit_zone_entered.connect(_on_pit_zone_entered)
     EventBus.pit_zone_exited.connect(_on_pit_zone_exited)
+    EventBus.riders_position_update.connect(_on_riders_position_update)
 
 func _process(_delta: float) -> void:
     # Update speedometer from rider (simplified)
@@ -50,9 +54,27 @@ func _on_pit_zone_exited(_racer_id: int) -> void:
         $ExchangeZone.visible = false
         in_exchange_zone = false
 
+func _on_riders_position_update(rider_positions: Array) -> void:
+    $Minimap.update_rider_positions(rider_positions)
+
 # Called from input handler
 func update_speed(speed_mph: float) -> void:
     current_speed = int(speed_mph)
 
 func set_sprint_energy(energy: float) -> void:
     sprint_energy = energy
+
+func _apply_safe_area_margins() -> void:
+    if not SafeAreaManager.is_safe_area_supported():
+        return
+
+    var margins = SafeAreaManager.get_safe_margins()
+
+    # For landscape race HUD, adjust right margin for notch
+    $RaceHUD.add_theme_constant_override("margin_right", margins.right + 8)
+
+    # Position elements to avoid safe area
+    if margins.right > 0:
+        # Move speedometer and minimap left to avoid right notch
+        $RaceHUD/Speedometer.position.x -= margins.right * 0.5
+        $RaceHUD/Minimap.position.x -= margins.right
