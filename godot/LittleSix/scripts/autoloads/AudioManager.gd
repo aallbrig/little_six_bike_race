@@ -1,5 +1,8 @@
 extends Node
 
+const TrainingActivity = preload("res://scripts/training/TrainingActivity.gd")
+const SaveManagerScript = preload("res://scripts/autoloads/SaveManager.gd")
+
 const SFX_CATALOG = {
 	# Training & UI
 	"activity_selected": "res://assets/audio/sfx/ui_click.ogg",

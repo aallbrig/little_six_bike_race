@@ -1,11 +1,11 @@
 extends Node
 
 enum ConnectionState {
-    DISCONNECTED,
-    CONNECTING,
-    CONNECTED,
-    IN_ROOM,
-    IN_RACE
+	DISCONNECTED,
+	CONNECTING,
+	CONNECTED,
+	IN_ROOM,
+	IN_RACE
 }
 
 var state: ConnectionState = ConnectionState.DISCONNECTED
@@ -16,108 +16,108 @@ var _websocket: WebSocketPeer = null
 var _heartbeat_timer: Timer = null
 
 func _ready() -> void:
-    # Skip WebSocket initialization if running headless (server) or not on web
-    if DisplayServer.get_name() == "headless" or not OS.has_feature("web"):
-        return
+	# Skip WebSocket initialization if running headless (server) or not on web
+	if DisplayServer.get_name() == "headless" or not OS.has_feature("web"):
+	    return
 
-    _heartbeat_timer = Timer.new()
-    _heartbeat_timer.wait_time = 1.0
-    _heartbeat_timer.timeout.connect(_send_heartbeat)
-    add_child(_heartbeat_timer)
+	_heartbeat_timer = Timer.new()
+	_heartbeat_timer.wait_time = 1.0
+	_heartbeat_timer.timeout.connect(_send_heartbeat)
+	add_child(_heartbeat_timer)
 
 func connect_to_matchmaking(server_url: String) -> void:
-    if state != ConnectionState.DISCONNECTED:
-        return
+	if state != ConnectionState.DISCONNECTED:
+	    return
 
-    state = ConnectionState.CONNECTING
-    _websocket = WebSocketPeer.new()
-    _websocket.connect_to_url(server_url)
+	state = ConnectionState.CONNECTING
+	_websocket = WebSocketPeer.new()
+	_websocket.connect_to_url(server_url)
 
-    # TODO: Send token in handshake
+	# TODO: Send token in handshake
 
 func join_quick_race() -> void:
-    if state != ConnectionState.CONNECTED:
-        return
-    send_message("JOIN_QUICK_RACE", {})
+	if state != ConnectionState.CONNECTED:
+	    return
+	send_message("JOIN_QUICK_RACE", {})
 
 func join_private_room(room_code: String) -> void:
-    if state != ConnectionState.CONNECTED:
-        return
-    send_message("JOIN_PRIVATE_ROOM", { "room_code": room_code })
+	if state != ConnectionState.CONNECTED:
+	    return
+	send_message("JOIN_PRIVATE_ROOM", { "room_code": room_code })
 
 func create_private_room() -> String:
-    if state != ConnectionState.CONNECTED:
-        return ""
-    var room_id = str(randi())  # Placeholder
-    send_message("CREATE_PRIVATE_ROOM", {})
-    return room_id
+	if state != ConnectionState.CONNECTED:
+	    return ""
+	var room_id = str(randi())  # Placeholder
+	send_message("CREATE_PRIVATE_ROOM", {})
+	return room_id
 
 func send_message(msg_type: String, payload: Dictionary) -> void:
-    if state == ConnectionState.DISCONNECTED:
-        return
+	if state == ConnectionState.DISCONNECTED:
+	    return
 
-    var message = {
-        "type": msg_type,
-        "payload": payload,
-        "ts": Time.get_unix_time_from_system()
-    }
+	var message = {
+	    "type": msg_type,
+	    "payload": payload,
+	    "ts": Time.get_unix_time_from_system()
+	}
 
-    var json_string = JSON.stringify(message)
-    _websocket.send_text(json_string)
+	var json_string = JSON.stringify(message)
+	_websocket.send_text(json_string)
 
 func disconnect_gracefully() -> void:
-    if _websocket:
-        _websocket.close()
-    state = ConnectionState.DISCONNECTED
-    EventBus.disconnected_from_server.emit("user_disconnect")
+	if _websocket:
+	    _websocket.close()
+	state = ConnectionState.DISCONNECTED
+	EventBus.disconnected_from_server.emit("user_disconnect")
 
 func _process(delta: float) -> void:
-    if not _websocket:
-        return
+	if not _websocket:
+	    return
 
-    _websocket.poll()
+	_websocket.poll()
 
-    var state_changed = false
-    match _websocket.get_ready_state():
-        WebSocketPeer.STATE_OPEN:
-            if state == ConnectionState.CONNECTING:
-                state = ConnectionState.CONNECTED
-                EventBus.connected_to_server.emit()
-                _heartbeat_timer.start()
-                state_changed = true
-        WebSocketPeer.STATE_CLOSED:
-            if state != ConnectionState.DISCONNECTED:
-                disconnect_gracefully()
-                state_changed = true
+	var state_changed = false
+	match _websocket.get_ready_state():
+	    WebSocketPeer.STATE_OPEN:
+	        if state == ConnectionState.CONNECTING:
+	            state = ConnectionState.CONNECTED
+	            EventBus.connected_to_server.emit()
+	            _heartbeat_timer.start()
+	            state_changed = true
+	    WebSocketPeer.STATE_CLOSED:
+	        if state != ConnectionState.DISCONNECTED:
+	            disconnect_gracefully()
+	            state_changed = true
 
-    # Process incoming messages
-    while _websocket.get_available_packet_count() > 0:
-        var packet = _websocket.get_packet()
-        var json_string = packet.get_string_from_utf8()
-        var message = JSON.parse_string(json_string)
+	# Process incoming messages
+	while _websocket.get_available_packet_count() > 0:
+	    var packet = _websocket.get_packet()
+	    var json_string = packet.get_string_from_utf8()
+	    var message = JSON.parse_string(json_string)
 
-        if message and message.has("type"):
-            _handle_network_message(message.type, message.get("payload", {}))
+	    if message and message.has("type"):
+	        _handle_network_message(message.type, message.get("payload", {}))
 
 func _handle_network_message(msg_type: String, payload: Dictionary) -> void:
-    match msg_type:
-        "HEARTBEAT_ACK":
-            # Update ping
-            ping_ms = int(Time.get_unix_time_from_system() * 1000) % 1000  # Simplified
-            EventBus.latency_updated.emit(ping_ms)
-        "RACE_START":
-            EventBus.race_started.emit()
-            state = ConnectionState.IN_RACE
-        "WORLD_STATE":
-            # Handle race synchronization from server
-            EventBus.network_message_received.emit(msg_type, payload)
-        "RACE_FINISHED":
-            EventBus.race_finished.emit(payload.get("results", []))
-            state = ConnectionState.IN_ROOM
-        _:
-            EventBus.network_message_received.emit(msg_type, payload)
+	match msg_type:
+	    "HEARTBEAT_ACK":
+	        # Update ping
+	        ping_ms = int(Time.get_unix_time_from_system() * 1000) % 1000  # Simplified
+	        EventBus.latency_updated.emit(ping_ms)
+	    "RACE_START":
+	        EventBus.race_started.emit()
+	        state = ConnectionState.IN_RACE
+	    "WORLD_STATE":
+	        # Handle race synchronization from server
+	        EventBus.network_message_received.emit(msg_type, payload)
+	    "RACE_FINISHED":
+	        EventBus.race_finished.emit(payload.get("results", []))
+	        state = ConnectionState.IN_ROOM
+	    _:
+	        EventBus.network_message_received.emit(msg_type, payload)
 
 func _send_heartbeat() -> void:
-    if state in [ConnectionState.IN_ROOM, ConnectionState.IN_RACE]:
-        send_message("HEARTBEAT", {})
-        # TODO: Start ping timer and measure latency on HEARTBEAT_ACK
+	if state in [ConnectionState.IN_ROOM, ConnectionState.IN_RACE]:
+	    send_message("HEARTBEAT", {})
+	    # TODO: Start ping timer and measure latency on HEARTBEAT_ACK

@@ -17,7 +17,7 @@ var _desync_count: int = 0
 var _rider_controllers: Dictionary = {}  # racer_id -> RiderController
 
 func _ready() -> void:
-	NetworkManager.race_synchronized.connect(_on_server_update)
+	NetworkMgr.race_synchronized.connect(_on_server_update)
 
 func register_rider(racer_id: int, rider_controller: RiderController) -> void:
 	"""Register a rider for reconciliation"""
@@ -115,7 +115,7 @@ func _reconcile_rider_state(rider: RiderController, server_state: Dictionary) ->
 
 func send_client_state() -> void:
 	"""Send current client state to server for reconciliation"""
-	if not NetworkManager.is_in_race():
+	if not NetworkMgr.is_in_race():
 		return
 
 	var client_state = {
@@ -140,7 +140,7 @@ func send_client_state() -> void:
 			"speed": rider.current_speed
 		}
 
-	NetworkManager.send_race_update(client_state)
+	NetworkMgr.send_race_update(client_state)
 
 func check_reconciliation_timeout() -> void:
 	"""Check if reconciliation has timed out (server not responding)"""

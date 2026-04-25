@@ -1,37 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://c3v3v3v3v3v3v3v3v3v3v3"]
+[gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://d4v4v4v4v4v4v4v4v4v4v4" path="res://scenes/cinematic/IntroCinematic.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://p5q5q5q5q5q5q5q5q5q5q5" path="res://scenes/race/RaceTrack.tscn" id="2"]
-
-[sub_resource type="Animation" id="Animation_1"]
-length = 30.0
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("UI/Title:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 22, 25, 28),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
-}
-
-[sub_resource type="Animation" id="Animation_2"]
-length = 30.0
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("UI/Subtitle:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 25, 28),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
-}
+[ext_resource type="PackedScene" path="res://scenes/race/RaceTrack.tscn" id="2"]
 
 [sub_resource type="Animation" id="Animation_3"]
 length = 30.0
@@ -63,24 +32,53 @@ tracks/0/keys = {
 "values": [60.0, 45.0, 75.0, 50.0, 65.0, 55.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_1"]
-_data = {
-"cinematic_timeline": SubResource("Animation_3"),
-"fov_timeline": SubResource("Animation_4"),
-"show_skip": SubResource("Animation_1"),
-"subtitle_fade": SubResource("Animation_2")
+[sub_resource type="Animation" id="Animation_1"]
+length = 30.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UI/Title:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 22, 25, 28),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 
-[node name="IntroCinematic" type="Node"]
-script = ExtResource("1")
+[sub_resource type="Animation" id="Animation_2"]
+length = 30.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UI/Subtitle:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 25, 28),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
 
-[node name="Background" type="Node" parent="."]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1"]
+_data = {
+&"cinematic_timeline": SubResource("Animation_3"),
+&"fov_timeline": SubResource("Animation_4"),
+&"show_skip": SubResource("Animation_1"),
+&"subtitle_fade": SubResource("Animation_2")
+}
 
-[node name="Track" parent="Background" instance=ExtResource("2")]
+[node name="IntroCinematic" type="Node" unique_id=1491797464]
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="Background" type="Node" parent="." unique_id=38954777]
 
-[node name="BackgroundRect" type="ColorRect" parent="UI"]
+[node name="Track" type="Node3D" parent="Background" unique_id=372780068 instance=ExtResource("2")]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1269384717]
+
+[node name="BackgroundRect" type="ColorRect" parent="UI" unique_id=1137296503]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -88,7 +86,8 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.05, 0.1, 0.7)
 
-[node name="Title" type="Label" parent="UI"]
+[node name="Title" type="Label" parent="UI" unique_id=1089051912]
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -105,9 +104,9 @@ theme_override_colors/font_color = Color(0.827451, 0.180392, 0.180392, 1)
 text = "LITTLE SIX"
 horizontal_alignment = 1
 vertical_alignment = 1
-modulate = Color(1, 1, 1, 0)
 
-[node name="Subtitle" type="Label" parent="UI"]
+[node name="Subtitle" type="Label" parent="UI" unique_id=379172643]
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -122,11 +121,10 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 24
 text = "The World's Greatest College Weekend"
 horizontal_alignment = 1
-modulate = Color(1, 1, 1, 0)
 
-[node name="SkipLabel" type="Label" parent="UI"]
+[node name="SkipLabel" type="Label" parent="UI" unique_id=286078105]
 visible = false
-anchors_preset = 5
+anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -120.0
@@ -138,17 +136,15 @@ theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "TAP TO SKIP"
 horizontal_alignment = 2
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-"": SubResource("AnimationLibrary_1")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1451949408]
+libraries/ = SubResource("AnimationLibrary_1")
 
-[node name="SkipTimer" type="Timer" parent="."]
+[node name="SkipTimer" type="Timer" parent="." unique_id=820324051]
 wait_time = 5.0
 one_shot = true
 autostart = true
 
-[node name="CinematicTimer" type="Timer" parent="."]
+[node name="CinematicTimer" type="Timer" parent="." unique_id=34629817]
 wait_time = 30.0
 one_shot = true
 autostart = true

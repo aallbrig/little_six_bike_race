@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://p5q5q5q5q5q5q5q5q5q5q5"]
 
-[ext_resource type="Script" uid="uid://r6s6s6s6s6s6s6s6s6s6s6" path="res://scripts/race/RaceTrack.gd" id="1"]
-[ext_resource type="Script" uid="uid://camera-script" path="res://scripts/race/RaceCamera.gd" id="2"]
-[ext_resource type="Script" uid="uid://player-rider" path="res://scripts/race/PlayerRider.gd" id="3"]
+[ext_resource type="Script" uid="uid://cbtwkgdmqdp6i" path="res://scripts/race/RaceTrack.gd" id="1"]
+[ext_resource type="Script" uid="uid://c3qfwixpephwt" path="res://scripts/race/RaceCamera.gd" id="2"]
+[ext_resource type="Script" uid="uid://csr0wy7i8i2kv" path="res://scripts/race/PlayerRider.gd" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/ui/RaceInputOverlay.tscn" id="5"]
 

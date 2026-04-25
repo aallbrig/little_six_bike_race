@@ -18,7 +18,7 @@ var _rider_controller: RiderController = null
 
 func _ready() -> void:
 	# Connect to network events
-	NetworkManager.race_synchronized.connect(_on_server_correction)
+	NetworkMgr.race_synchronized.connect(_on_server_correction)
 
 func set_rider_controller(rider: RiderController) -> void:
 	"""Set the rider controller to predict for"""
@@ -176,7 +176,7 @@ func clear_prediction_buffer() -> void:
 
 func get_average_prediction_error() -> float:
 	"""Get average prediction error over recent corrections"""
-	if NetworkManager.get_prediction_error_count() == 0:
+	if NetworkMgr.get_prediction_error_count() == 0:
 		return 0.0
 
 	# This would need to be implemented in NetworkManager

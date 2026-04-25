@@ -29,7 +29,7 @@ func _check_orientation() -> void:
 			hide_overlay()
 
 func set_target_orientation(orientation: int) -> void:
-	_target_orientation = orientation
+	_target_orientation = orientation as DisplayServer.ScreenOrientation
 	_check_orientation()  # Immediate check
 
 func show_overlay() -> void:

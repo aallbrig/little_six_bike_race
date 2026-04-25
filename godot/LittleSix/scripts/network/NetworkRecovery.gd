@@ -76,7 +76,7 @@ func _attempt_reconnection() -> void:
 	# Wait before attempting
 	await get_tree().create_timer(_reconnect_delay * _reconnect_attempts).timeout
 
-	if _network_manager and _network_manager.get_connection_state() == NetworkManager.ConnectionState.DISCONNECTED:
+	if _network_manager and _network_manager.get_connection_state() == NetworkMgr.ConnectionState.DISCONNECTED:
 		var success = _network_manager.connect_to_server()
 		if not success:
 			# Try again with exponential backoff
@@ -112,7 +112,7 @@ func _get_current_game_state() -> Dictionary:
 		if current_scene.name == "RaceTrack":
 			state["game_mode"] = "racing"
 			# Extract racing state
-			var race_controller = current_scene.get_node_or_null("RaceController")
+			var race_controller = current_scene.race_controller if current_scene.has_method("get") and current_scene.get("race_controller") else null
 			if race_controller:
 				state["race_state"] = {
 					"lap": race_controller.rider_laps.get(0, 0),  # Local player

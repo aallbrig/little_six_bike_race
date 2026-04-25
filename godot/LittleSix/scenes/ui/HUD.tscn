@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://q7r7r7r7r7r7r7r7r7r7r7"]
 
-[ext_resource type="Script" uid="uid://s8t8t8t8t8t8t8t8t8t8t8" path="res://scenes/ui/HUD.gd" id="1"]
+[ext_resource type="Script" uid="uid://c8lpb1ajulvku" path="res://scenes/ui/HUD.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://sprint-bar-component" path="res://scenes/ui/components/SprintBar.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://minimap-component" path="res://scenes/ui/components/Minimap.tscn" id="3"]
 

@@ -24,6 +24,9 @@ EventBus="*res://scripts/autoloads/EventBus.gd"
 HostBridge="*res://scripts/autoloads/HostBridge.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
 TransitionManager="*res://scripts/autoloads/TransitionManager.gd"
+SaveManager="*res://scripts/autoloads/SaveManager.gd"
+AudioManager="*res://scripts/autoloads/AudioManager.gd"
+NetworkMgr="*res://scripts/network/NetworkManager.gd"
 
 [display]
 

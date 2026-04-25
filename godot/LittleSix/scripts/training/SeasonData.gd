@@ -11,25 +11,25 @@ extends Resource
 @export var spring_series_results: Array = []  # Array of EventResult
 
 func to_dict() -> Dictionary:
-    return {
-        "season_id": season_id,
-        "current_week": current_week,
-        "current_day": current_day,
-        "is_race_week": is_race_week,
-        "qualifying_time": qualifying_time,
-        "qualifying_position": qualifying_position,
-        "weeks_completed": weeks_completed,
-        "spring_series_results": spring_series_results
-    }
+	return {
+	    "season_id": season_id,
+	    "current_week": current_week,
+	    "current_day": current_day,
+	    "is_race_week": is_race_week,
+	    "qualifying_time": qualifying_time,
+	    "qualifying_position": qualifying_position,
+	    "weeks_completed": weeks_completed,
+	    "spring_series_results": spring_series_results
+	}
 
 static func from_dict(d: Dictionary) -> SeasonData:
-    var season = SeasonData.new()
-    season.season_id = d.get("season_id", "")
-    season.current_week = d.get("current_week", 1)
-    season.current_day = d.get("current_day", 1)
-    season.is_race_week = d.get("is_race_week", false)
-    season.qualifying_time = d.get("qualifying_time", 0.0)
-    season.qualifying_position = d.get("qualifying_position", 0)
-    season.weeks_completed = d.get("weeks_completed", [])
-    season.spring_series_results = d.get("spring_series_results", [])
-    return season
+	var season = SeasonData.new()
+	season.season_id = d.get("season_id", "")
+	season.current_week = d.get("current_week", 1)
+	season.current_day = d.get("current_day", 1)
+	season.is_race_week = d.get("is_race_week", false)
+	season.qualifying_time = d.get("qualifying_time", 0.0)
+	season.qualifying_position = d.get("qualifying_position", 0)
+	season.weeks_completed = d.get("weeks_completed", [])
+	season.spring_series_results = d.get("spring_series_results", [])
+	return season
