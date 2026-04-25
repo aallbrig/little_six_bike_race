@@ -22,52 +22,42 @@ color = Color(0.1, 0.05, 0.15, 1)
 
 [node name="Title" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 0.3
 anchor_right = 0.5
-anchor_bottom = 0.3
 offset_left = -300.0
-offset_top = -60.0
+offset_top = 200.0
 offset_right = 300.0
-offset_bottom = 60.0
+offset_bottom = 300.0
 grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 72
-theme_override_colors/font_color = Color(0.827451, 0.180392, 0.180392, 1)
+theme_override_font_sizes/font_size = 64
 text = "LITTLE SIX"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 0.45
 anchor_right = 0.5
-anchor_bottom = 0.45
-offset_left = -250.0
-offset_top = -20.0
-offset_right = 250.0
-offset_bottom = 20.0
+offset_left = -300.0
+offset_top = 320.0
+offset_right = 300.0
+offset_bottom = 360.0
 grow_horizontal = 2
-grow_vertical = 2
 theme_override_font_sizes/font_size = 24
 text = "The World's Greatest College Weekend"
 horizontal_alignment = 1
 
 [node name="TapLabel" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 0.65
 anchor_right = 0.5
-anchor_bottom = 0.65
-offset_left = -150.0
-offset_top = -20.0
-offset_right = 150.0
-offset_bottom = 20.0
+offset_left = -200.0
+offset_top = 450.0
+offset_right = 200.0
+offset_bottom = 490.0
 grow_horizontal = 2
-grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "TAP TO START"
 horizontal_alignment = 1
