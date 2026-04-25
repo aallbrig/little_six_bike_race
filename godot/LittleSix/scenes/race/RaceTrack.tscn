@@ -1,6 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://p5q5q5q5q5q5q5q5q5q5q5"]
+[gd_scene load_steps=5 format=3 uid="uid://p5q5q5q5q5q5q5q5q5q5q5"]
 
-[ext_resource type="Script" uid="uid://r6s6s6s6s6s6s6s6s6s6s6" path="res://scenes/race/RaceTrack.gd" id="1"]
+[ext_resource type="Script" uid="uid://r6s6s6s6s6s6s6s6s6s6s6" path="res://scripts/race/RaceTrack.gd" id="1"]
+[ext_resource type="Script" uid="uid://camera-script" path="res://scripts/race/RaceCamera.gd" id="2"]
+[ext_resource type="Script" uid="uid://player-rider" path="res://scripts/race/PlayerRider.gd" id="3"]
 
 [sub_resource type="Curve3D" id="Curve3D_1"]
 _data = {
@@ -25,7 +27,17 @@ skeleton = NodePath("")
 
 [node name="Riders" type="Node3D" parent="."]
 
-[node name="Camera" type="Camera3D" parent="."]
+[node name="PlayerRider" type="Node3D" parent="Riders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("3")
+metadata/is_player = true
+metadata/racer_id = 0
+
+[node name="RaceCamera" type="Node3D" parent="." node_paths=PackedStringArray("target_rider")]
+script = ExtResource("2")
+target_rider = NodePath("../Riders/PlayerRider")
+
+[node name="Camera3D" type="Camera3D" parent="RaceCamera"]
 transform = Transform3D(0.707107, 0.353553, 0.612372, 0, 0.866025, -0.5, -0.707107, 0.353553, 0.612372, 25, 15, 25)
 fov = 60
 near = 0.1
@@ -34,3 +46,9 @@ far = 200.0
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 0, 0)
 shadow_enabled = true
+
+[node name="StartFinishLine" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -40)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StartFinishLine"]
+shape = SubResource("BoxMesh_1")
