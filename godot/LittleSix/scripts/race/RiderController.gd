@@ -2,10 +2,6 @@ extends CharacterBody3D
 class_name RiderController
 
 # Physics constants from Spec 010
-const MASS = 85.0  # kg (rider + bike)
-const ACCEL = 5.0  # m/s² desired acceleration when pedaling
-const COAST_DECEL = 0.05  # m/s² rolling resistance
-const BRAKE_DECEL = 7.0   # m/s² coaster brake
 const MAX_SPEED = 12.0    # m/s (~27 mph) - terminal velocity
 const DRAFT_BONUS = 0.3   # 30% drag reduction when drafting
 
@@ -15,10 +11,12 @@ var is_braking = false
 var is_sprinting = false
 var sprint_energy = 100.0
 var is_drafting = false
-var current_speed = 0.0
 var track_progress = 0.0  # 0-1 around the track
 var racer_id = 0
 var is_ai = false
+
+# Physics system
+var bike_physics: BikePhysics
 
 # References
 var draft_detector: Area3D
@@ -27,6 +25,10 @@ func _ready() -> void:
     # Setup collision
     collision_layer = 1
     collision_mask = 1
+
+    # Initialize bike physics
+    bike_physics = BikePhysics.new()
+    add_child(bike_physics)
 
     # Create draft detector
     draft_detector = Area3D.new()
@@ -40,27 +42,23 @@ func _ready() -> void:
     draft_detector.area_exited.connect(_on_draft_area_exited)
 
 func _physics_process(delta: float) -> void:
-    # Calculate forces per Spec 010
-    var pedal_force = 0.0
-    if is_pedaling and not is_braking:
-        pedal_force = MASS * ACCEL
+    # Update bike physics state
+    bike_physics.is_pedaling = is_pedaling
+    bike_physics.is_braking = is_braking
 
-    var drag = 0.3 * current_speed * current_speed
+    # Apply drafting bonus to physics
     if is_drafting:
-        drag *= (1.0 - DRAFT_BONUS)
+        # Temporarily reduce drag coefficient for drafting
+        bike_physics.DRAG_COEFFICIENT = 0.3 * (1.0 - DRAFT_BONUS)
+    else:
+        bike_physics.DRAG_COEFFICIENT = 0.3
 
-    var rolling_resistance = MASS * 9.8 * 0.005  # μ_r = 0.005 for cinder
+    # Update physics
+    bike_physics.update_velocity(delta)
+    current_speed = bike_physics.velocity
 
-    var brake_force = 0.0
-    if is_braking:
-        brake_force = MASS * 9.8 * 0.7  # μ_b = 0.7 for coaster brake
-
-    # Net force
-    var net_force = pedal_force - drag - rolling_resistance - brake_force
-
-    # Update velocity
-    var acceleration = net_force / MASS
-    current_speed = clamp(current_speed + acceleration * delta, 0.0, MAX_SPEED)
+    # Clamp to max speed
+    current_speed = min(current_speed, MAX_SPEED)
 
     # Apply movement
     if is_ai:
@@ -129,9 +127,10 @@ func release_brake() -> void:
     is_pedaling = true
 
 func get_speed_mph() -> float:
-    return current_speed * 2.237  # m/s to mph
+    return bike_physics.get_speed_mph()
 
 func reset_for_new_lap() -> void:
     sprint_energy = 100.0
     is_sprinting = false
     is_braking = false
+    bike_physics.reset()
