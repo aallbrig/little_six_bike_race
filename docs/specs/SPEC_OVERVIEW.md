@@ -23,8 +23,10 @@ Work through specs in this order. Each spec builds on previous ones. Do not star
 | 7 | [Mobile UI/UX](spec_007_mobile_ui_ux.md) | Spec 1, 2 | Medium |
 | 8 | [Audio System](spec_008_audio_system.md) | Spec 1 | Low |
 | 9 | [Player Progression & Persistence](spec_009_player_progression.md) | Spec 3, 4 | Medium |
-| 10 | [Race Physics & Simulation](spec_010_race_physics_simulation.md) | Spec 4 | High |
-| 11 | [Static Marketing Website & Game Host](spec_011_static_website.md) | Spec 1, 6 | Low |
+| 10 | [Event Telemetry Logger](spec_010_event_telemetry.md) | Spec 1 | Low |
+| 11 | [Event-Driven Testing Strategy](spec_011_event_driven_testing.md) | Spec 10 | Medium |
+| 12 | [Race Physics & Simulation](spec_010_race_physics_simulation.md) | Spec 4 | High |
+| 13 | [Static Marketing Website & Game Host](spec_011_static_website.md) | Spec 1, 6 | Low |
 
 ---
 
@@ -36,15 +38,17 @@ Use this table to track implementation progress:
 |---|---|---|
 | 001 — Project Structure | Complete | All autoloads, data classes, and core structure implemented |
 | 002 — Attract Mode | Complete | Logo, Cinematic, Title, Demo scenes with iris transitions and loop |
-| 003 — Training System | Not started | |
-| 004 — Multiplayer Race | Not started | |
-| 005 — Networking | Not started | |
-| 006 — AWS Infrastructure | Not started | |
-| 007 — Mobile UI/UX | Not started | |
-| 008 — Audio System | Not started | |
-| 009 — Progression | Not started | |
-| 010 — Race Physics | Not started | |
-| 011 — Static Website | Complete | Marketing site with game host, mobile responsive, assets placeholders |
+| 003 — Training System | Complete | Tamagotchi mechanics, activity selection, stat progression, random events |
+| 004 — Multiplayer Race | Complete | RaceController, RiderController, physics, lap tracking, AI opponents |
+| 005 — Networking | Not started | Real-time multiplayer infrastructure |
+| 006 — AWS Infrastructure | Not started | Cloud deployment and backend services |
+| 007 — Mobile UI/UX | Partially Complete | Component library integrated into TrainingDay, HUD; full scene integration pending |
+| 008 — Audio System | Not started | Sound effects and music implementation |
+| 009 — Progression | Not started | Enhanced save/load system |
+| 010 — Event Telemetry | Not started | EventBus signal monitoring and console logging |
+| 011 — Event-Driven Testing | Not started | GUT test strategy with event focus |
+| 012 — Race Physics | Not started | Advanced physics simulation |
+| 013 — Static Website | Complete | Marketing site with game host, mobile responsive, assets placeholders |
 
 ---
 

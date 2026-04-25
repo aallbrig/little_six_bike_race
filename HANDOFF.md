@@ -63,35 +63,45 @@ Little Six is a multiplayer browser-based cycling game inspired by Indiana Unive
 - Mobile UI components render correctly
 
 ### **Known Limitations**
-- No actual game content beyond attract mode (no racing, training, etc.)
-- Placeholder assets and sounds
-- AWS infrastructure not yet deployed
-- No multiplayer networking implemented
-- Some EventBus signals are commented out (awaiting future specs)
+- UI integration is partial (TrainingDay and HUD updated; Race and other scenes need component library integration)
+- Audio system uses placeholders (missing .ogg files)
+- AWS infrastructure and networking not implemented
+- No GUT tests exist yet (Spec 011 will address this)
+- Telemetry logger is implemented but may need configuration integration with SettingsData
 
 ## 🎯 **Next Development Priorities**
 
-### **Immediate Next Steps**
-1. **Spec 003 - Training System**: Implement Tamagotchi mechanics
-   - Daily training choices and fatigue management
-   - Random events and stat progression
-   - Training UI and progression tracking
+### **Recently Completed**
+- **Spec 003 - Training System**: Full Tamagotchi implementation (activity selection, fatigue, random events, stat progression)
+- **Spec 004 - Multiplayer Race**: Core racing mechanics (RaceController, RiderController, physics, AI opponents, lap tracking)
+- **Spec 007 UI Components**: Integrated ActivityCard, StatBar, FatigueArc, SprintBar into TrainingDay and HUD scenes
+- **EventTelemetryLogger**: Added (see Spec 010) - listens to ALL EventBus signals with rich console output
 
-2. **Spec 004 - Multiplayer Race**: Core racing mechanics
-   - Race track and bike physics
-   - Rider controls and camera system
-   - Race state management
+### **New Epics for Next Agent (Added per user request)**
+**Epic 1: Event Telemetry & Observability (Spec 010)**
+- Implement comprehensive EventBus signal monitoring
+- Create `EventTelemetryLogger.gd` (already added as autoload)
+- Configurable logging with filtering and statistics
+- Console telemetry for training, racing, input, state changes
+- See `docs/specs/spec_010_event_telemetry.md`
 
-3. **Spec 007 Completion**: Remaining UI components
-   - Integrate all components into actual scenes
-   - Implement touch controls in race scenes
-   - Complete settings persistence
+**Epic 2: Event-Driven Testing Strategy (Spec 011)**
+- Establish GUT-based testing framework focused on events
+- Document rubric for "good event-driven tests"
+- Create test suites for Training, Race, UI, State Management, and Telemetry
+- Ensure all major EventBus signals have dedicated tests
+- See `docs/specs/spec_011_event_driven_testing.md` and `docs/testing/README.md`
+
+### **Remaining Immediate Priorities**
+1. **Complete Spec 007**: Full integration of components into ALL scenes + settings persistence
+2. **Spec 008 - Audio System**: Implement missing music and sound effects
+3. **Spec 005 - Networking Layer**: Real-time multiplayer infrastructure
+4. **Spec 006 - AWS Infrastructure**: Cloud deployment setup
 
 ### **Medium-term Goals**
-4. **Spec 005 - Networking Layer**: Real-time multiplayer
-5. **Spec 006 - AWS Infrastructure**: Cloud deployment
-6. **Spec 008 - Audio System**: Sound effects and music
-7. **Spec 009 - Player Progression**: Save/load system
+- Spec 009 - Enhanced Player Progression & Save System
+- Spec 012 - Advanced Race Physics & Simulation
+- Complete test coverage per Spec 011 (target 50+ event-driven tests)
 
 ## 🛠️ **Development Environment**
 
@@ -203,10 +213,18 @@ scripts/              # All development tasks
 ## 📚 **Documentation Resources**
 
 ### **Specifications**
-- `docs/specs/SPEC_OVERVIEW.md` - Index of all specs
+- `docs/specs/SPEC_OVERVIEW.md` - Index of all specs (updated with new epics)
 - `docs/specs/spec_001_godot_project_structure.md` - Project foundation
 - `docs/specs/spec_002_attract_mode_flow.md` - Current implementation
-- `docs/specs/spec_007_mobile_ui_ux.md` - UI/UX system
+- `docs/specs/spec_003_training_tamagotchi.md` - Training system (implemented)
+- `docs/specs/spec_004_multiplayer_race.md` - Race system (implemented)
+- `docs/specs/spec_007_mobile_ui_ux.md` - UI/UX system (partially implemented)
+- `docs/specs/spec_010_event_telemetry.md` - **NEW** - EventBus telemetry logger
+- `docs/specs/spec_011_event_driven_testing.md` - **NEW** - GUT event-driven testing strategy
+
+### **Testing & Observability**
+- `docs/testing/README.md` - Event-driven testing rubric and strategy
+- `docs/specs/spec_010_event_telemetry.md` - Telemetry implementation guide
 
 ### **Design Documents**
 - `docs/GDD.md` - Game Design Document

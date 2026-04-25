@@ -31,6 +31,7 @@ HostBridge="*res://scripts/autoloads/HostBridge.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
 TransitionManager="*res://scripts/autoloads/TransitionManager.gd"
 TrainingManager="*res://scripts/training/TrainingManager.gd"
+EventTelemetryLogger="*res://scripts/autoloads/EventTelemetryLogger.gd"
 
 [display]
 
