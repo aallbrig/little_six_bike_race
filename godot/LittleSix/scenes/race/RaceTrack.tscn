@@ -5,6 +5,11 @@
 [ext_resource type="Script" uid="uid://player-rider" path="res://scripts/race/PlayerRider.gd" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/ui/RaceInputOverlay.tscn" id="5"]
+[ext_resource type="Script" path="res://scripts/race/QualifyingController.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/race/MissNOutController.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/race/TeamPursuitController.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/race/StartingGridController.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/race/CollisionController.gd" id="10"]
 
 [sub_resource type="Curve3D" id="Curve3D_1"]
 _data = {
@@ -111,3 +116,18 @@ shape = SubResource("BoxMesh_1")
 [node name="HUD" parent="." instance=ExtResource("4")]
 
 [node name="RaceInputOverlay" parent="." instance=ExtResource("5")]
+
+[node name="QualifyingController" type="Node" parent="."]
+script = ExtResource("6")
+
+[node name="MissNOutController" type="Node" parent="."]
+script = ExtResource("7")
+
+[node name="TeamPursuitController" type="Node" parent="."]
+script = ExtResource("8")
+
+[node name="StartingGridController" type="Node" parent="."]
+script = ExtResource("9")
+
+[node name="CollisionController" type="Node" parent="."]
+script = ExtResource("10")
