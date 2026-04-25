@@ -25,7 +25,9 @@ var current_player: PlayerData = null
 var current_season: SeasonData = null
 
 func _ready() -> void:
-    # Connect to EventBus for network-driven state changes
+    # Connect to EventBus for race events
+    EventBus.race_finished.connect(_on_race_finished)
+
     # TODO: Uncomment when Spec 005 is implemented
     # EventBus.network_message_received.connect(_on_network_message_received)
 
@@ -58,6 +60,10 @@ func get_current_scene() -> Node:
 
 func _on_scene_loaded(scene: Node) -> void:
     pass  # Override in subclasses if needed
+
+func _on_race_finished(results: Array) -> void:
+    print("Race finished with ", results.size(), " results")
+    transition_to(GameState.RACE_RESULTS, {"results": results})
 
 func _enter_state(state: GameState, data: Dictionary) -> void:
     # Handle orientation changes

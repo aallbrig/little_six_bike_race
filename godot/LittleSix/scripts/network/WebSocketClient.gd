@@ -25,7 +25,7 @@ func connect_to(url: String, token: String = "") -> void:
 	if token != "":
 		headers.append("Authorization: Bearer " + token)
 
-	var err = _ws.connect_to_url(url, TLSOptions.client_unsafe(), headers)
+	var err = _ws.connect_to_url(url, headers)
 	if err != OK:
 		connection_failed.emit("Failed to initiate connection: " + str(err))
 		return
@@ -131,7 +131,7 @@ func _parse_incoming_message(json_text: String) -> bool:
 	return true
 
 # Public getters
-func is_connected() -> bool:
+func is_ws_connected() -> bool:
 	return _state == WebSocketPeer.STATE_OPEN
 
 func get_connection_state() -> WebSocketPeer.State:

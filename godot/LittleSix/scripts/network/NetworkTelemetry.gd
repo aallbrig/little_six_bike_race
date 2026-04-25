@@ -49,7 +49,7 @@ func _process(delta: float) -> void:
 
 func _send_ping() -> void:
 	"""Send a ping to measure latency"""
-	if not _ws_client or not _ws_client.is_connected():
+	if not _ws_client or not _ws_client.is_ws_connected():
 		return
 
 	_ping_id += 1
@@ -88,7 +88,7 @@ func _update_telemetry() -> void:
 	var telemetry = {
 		"connection": {
 			"state": _network_manager.get_connection_state() if _network_manager else "unknown",
-			"is_connected": _network_manager.is_connected() if _network_manager else false,
+			"is_connected": _network_manager.is_network_connected() if _network_manager else false,
 			"url": _ws_client.get_url() if _ws_client else ""
 		},
 		"latency": {

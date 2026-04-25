@@ -1,5 +1,5 @@
 extends Node
-class_name NetworkManager
+class_name NetworkManagerSingleton
 
 # High-level network coordinator for Little Six (Spec 005)
 # Manages WebSocket connection, matchmaking, and game state sync
@@ -229,7 +229,7 @@ func _on_matchmaking_error(error_type: String, message: String) -> void:
 func get_connection_state() -> ConnectionState:
 	return _connection_state
 
-func is_connected() -> bool:
+func is_network_connected() -> bool:
 	return _connection_state != ConnectionState.DISCONNECTED
 
 func is_in_lobby() -> bool:

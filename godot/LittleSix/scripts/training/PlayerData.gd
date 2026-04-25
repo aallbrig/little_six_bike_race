@@ -10,7 +10,7 @@ extends Resource
 @export var current_season: SeasonData = null
 @export var career_wins: int = 0
 @export var career_races: int = 0
-@export var unlocked_cosmetics: Array[String] = []
+@export var unlocked_cosmetics: Array = []
 
 func to_dict() -> Dictionary:
     return {
@@ -39,5 +39,6 @@ static func from_dict(d: Dictionary) -> PlayerData:
         player.current_season = SeasonData.from_dict(d.current_season)
     player.career_wins = d.get("career_wins", 0)
     player.career_races = d.get("career_races", 0)
-    player.unlocked_cosmetics = d.get("unlocked_cosmetics", [])
+    var cosmetics = d.get("unlocked_cosmetics", [])
+    player.unlocked_cosmetics = cosmetics if cosmetics is Array else []
     return player

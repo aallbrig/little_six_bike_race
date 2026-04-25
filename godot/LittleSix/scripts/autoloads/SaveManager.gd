@@ -7,13 +7,13 @@ var settings_data: SettingsData = null
 
 func _ready() -> void:
     settings_data = SettingsData.new()  # Always initialize with defaults
+    player_data = PlayerData.new()  # Always have a player data instance
     load_game()
 
 func load_game() -> bool:
     var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
     if not file:
-        # No save file exists
-        player_data = null
+        # No save file exists - keep the default player_data
         return false
 
     var json_string = file.get_as_text()
@@ -23,14 +23,13 @@ func load_game() -> bool:
     var error = json.parse(json_string)
     if error != OK:
         push_error("Failed to parse save file: " + json.get_error_message())
-        player_data = null
+        # Keep the default player_data on parse error
         return false
 
     var data = json.get_data()
     if data.has("player"):
         # Deserialize PlayerData from dict
-        player_data = PlayerData.new()
-        player_data.from_dict(data.player)
+        player_data = PlayerData.from_dict(data.player)
 
     if data.has("settings"):
         # Deserialize SettingsData from dict
@@ -105,8 +104,7 @@ func import_save_json(json: String) -> void:
 
     var data = json_parser.get_data()
     if data.has("player"):
-        player_data = PlayerData.new()
-        player_data.from_dict(data.player)
+        player_data = PlayerData.from_dict(data.player)
     if data.has("settings"):
         settings_data.from_dict(data.settings)
     save_game()
