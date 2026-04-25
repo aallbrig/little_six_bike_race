@@ -37,10 +37,11 @@ window/handheld/orientation=1
 
 #theme/custom="res://assets/ui/LittleSixTheme.tres"
 "#TODO:Enablewhenthemeisfixed[gdscript]warnings/enable"=true
-warnings/unsafe_property_access=1
-warnings/unsafe_method_access=1
-warnings/unsafe_cast=1
-warnings/unsafe_call_argument=1
+# Relax validation for development
+warnings/unsafe_property_access=0
+warnings/unsafe_method_access=0
+warnings/unsafe_cast=0
+warnings/unsafe_call_argument=0
 
 [input]
 

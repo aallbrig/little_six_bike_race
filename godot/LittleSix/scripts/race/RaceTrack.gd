@@ -5,44 +5,44 @@ class_name RaceTrack
 
 @onready var race_camera: RaceCamera = $RaceCamera
 @onready var riders_container: Node3D = $Riders
-@onready var hud: Control = $HUD
-@onready var race_input_overlay: Control = $RaceInputOverlay
 
 var player_rider: Node3D = null
 
 func _ready() -> void:
-    # Find the player rider
-    for child in riders_container.get_children():
-        if child.has_meta("is_player") and child.get_meta("is_player"):
-            player_rider = child
-            break
+	# Find the player rider
+	for child in riders_container.get_children():
+		if child.has_meta("is_player") and child.get_meta("is_player"):
+			player_rider = child
+			break
 
-    # Set camera target if we found the player
-    if player_rider and race_camera:
-        race_camera.set_target_rider(player_rider)
+	# Set camera target if we found the player
+	if player_rider and race_camera:
+		race_camera.set_target_rider(player_rider)
 
-    # Connect to race events
-    EventBus.race_started.connect(_on_race_started)
-    EventBus.pit_zone_entered.connect(_on_pit_zone_entered)
-    EventBus.pit_zone_exited.connect(_on_pit_zone_exited)
+	# Connect to race events
+	EventBus.race_started.connect(_on_race_started)
+	EventBus.pit_zone_entered.connect(_on_pit_zone_entered)
+	EventBus.pit_zone_exited.connect(_on_pit_zone_exited)
 
 func _on_race_started() -> void:
-    # Ensure camera is properly initialized
-    if race_camera and player_rider:
-        race_camera.set_target_rider(player_rider)
+	# Ensure camera is properly initialized
+	if race_camera and player_rider:
+		race_camera.set_target_rider(player_rider)
 
 func _on_pit_zone_entered(racer_id: int) -> void:
-    if racer_id == 0 and race_input_overlay:  # Local player
-        race_input_overlay.set_exchange_visible(true)
+	var race_input_overlay = get_node_or_null("RaceInputOverlay")
+	if racer_id == 0 and race_input_overlay:  # Local player
+		race_input_overlay.set_exchange_visible(true)
 
 func _on_pit_zone_exited(racer_id: int) -> void:
-    if racer_id == 0 and race_input_overlay:  # Local player
-        race_input_overlay.set_exchange_visible(false)
+	var race_input_overlay = get_node_or_null("RaceInputOverlay")
+	if racer_id == 0 and race_input_overlay:  # Local player
+		race_input_overlay.set_exchange_visible(false)
 
 # Public API for external control
 func get_race_camera() -> RaceCamera:
-    return race_camera
+	return race_camera
 
 func set_camera_mode(mode: RaceCamera.CameraMode, duration: float = 3.0) -> void:
-    if race_camera:
-        race_camera.set_camera_mode(mode, duration)
+	if race_camera:
+		race_camera.set_camera_mode(mode, duration)
