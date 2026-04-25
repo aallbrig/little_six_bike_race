@@ -9,7 +9,11 @@ func _on_train_pressed() -> void:
     GameManager.transition_to(GameManager.GameState.TRAINING_DAY)
 
 func _on_race_pressed() -> void:
-    # Use matchmaking instead of direct lobby
-    var matchmaking = load("res://scripts/network/MatchmakingClient.gd").new()
-    add_child(matchmaking)
-    matchmaking.quick_match()
+    # Use NetworkManager for matchmaking
+    if NetworkManager.find_match("quick"):
+        print("Finding match...")
+        # Transition will happen when match is found
+    else:
+        print("Failed to start matchmaking")
+        # Fallback to local simulation
+        GameManager.transition_to(GameManager.GameState.RACE_ACTIVE)

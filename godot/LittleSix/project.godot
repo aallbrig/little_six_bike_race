@@ -26,7 +26,7 @@ buses/default_bus_layout="res://audio_bus_layout.tres"
 EventBus="*res://scripts/autoloads/EventBus.gd"
 SaveManager="*res://scripts/autoloads/SaveManager.gd"
 AudioManager="*res://scripts/autoloads/AudioManager.gd"
-NetworkManager="*res://scripts/autoloads/NetworkManager.gd"
+NetworkManager="*res://scripts/network/NetworkManager.gd"
 HostBridge="*res://scripts/autoloads/HostBridge.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
 TransitionManager="*res://scripts/autoloads/TransitionManager.gd"
@@ -43,7 +43,7 @@ window/handheld/orientation=1
 
 [gui]
 
-theme/custom="res://assets/ui/LittleSixTheme.tres"
+#theme/custom="res://assets/ui/LittleSixTheme.tres"
 "#TODO:Enablewhenthemeisfixed[gdscript]warnings/enable"=true
 warnings/unsafe_property_access=2
 warnings/unsafe_method_access=2
