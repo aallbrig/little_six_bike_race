@@ -1,6 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://j1k1k1k1k1k1k1k1k1k1k1"]
+[gd_scene load_steps=6 format=3 uid="uid://j1k1k1k1k1k1k1k1k1k1k1"]
 
 [ext_resource type="Script" uid="uid://l2m2m2m2m2m2m2m2m2m2m2" path="res://scenes/training/TrainingDay.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://dqeqeqeqeqeqeqeqeqeqeqeq" path="res://scenes/ui/components/ActivityCard.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://frfrfrfrfrfrfrfrfrfrfrfr" path="res://scenes/ui/components/StatBar.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://gtgtgtgtgtgtgtgtgtgtgtgt" path="res://scenes/ui/components/FatigueArc.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://tutorial-overlay" path="res://scenes/ui/TutorialOverlay.tscn" id="5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
 bg_color = Color(0.2, 0.2, 0.2, 1)
@@ -42,12 +46,9 @@ theme_override_font_sizes/font_size = 28
 text = "WEEK 1 — DAY 1"
 horizontal_alignment = 1
 
-[node name="FatigueLabel" type="Label" parent="Header"]
+[node name="FatigueArc" parent="Header" instance=ExtResource("4")]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
-text = "FATIGUE: FRESH"
-horizontal_alignment = 2
 
 [node name="StatsContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -60,41 +61,20 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
 
-[node name="Speed" type="HBoxContainer" parent="StatsContainer"]
+[node name="Speed" parent="StatsContainer" instance=ExtResource("3")]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="StatsContainer/Speed"]
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-text = "SPEED"
-
-[node name="Bar" type="ProgressBar" parent="StatsContainer/Speed"]
-layout_mode = 2
-size_flags_horizontal = 3
-value = 65.0
-
-[node name="Value" type="Label" parent="StatsContainer/Speed"]
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-text = "65"
-
-[node name="Endurance" type="HBoxContainer" parent="StatsContainer"]
+[node name="Endurance" parent="StatsContainer" instance=ExtResource("3")]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="StatsContainer/Endurance"]
-custom_minimum_size = Vector2(120, 0)
+[node name="Recovery" parent="StatsContainer" instance=ExtResource("3")]
 layout_mode = 2
-text = "ENDURANCE"
 
-[node name="Bar" type="ProgressBar" parent="StatsContainer/Endurance"]
+[node name="Handling" parent="StatsContainer" instance=ExtResource("3")]
 layout_mode = 2
-size_flags_horizontal = 3
-value = 50.0
 
-[node name="Value" type="Label" parent="StatsContainer/Endurance"]
-custom_minimum_size = Vector2(40, 0)
+[node name="TeamChem" parent="StatsContainer" instance=ExtResource("3")]
 layout_mode = 2
-text = "50"
 
 [node name="Activities" type="GridContainer" parent="."]
 layout_mode = 1
@@ -107,29 +87,37 @@ columns = 2
 theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 20
 
-[node name="Activity1" type="Button" parent="Activities"]
+[node name="Activity1" parent="Activities" instance=ExtResource("1")]
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
-text = "SPRINT INTERVALS
-+Speed +Fatigue"
 
-[node name="Activity2" type="Button" parent="Activities"]
+[node name="Activity2" parent="Activities" instance=ExtResource("1")]
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
-text = "LONG RIDE
-+Endurance"
 
-[node name="Activity3" type="Button" parent="Activities"]
+[node name="Activity3" parent="Activities" instance=ExtResource("1")]
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
-text = "RECOVERY SPIN
--4 Fatigue"
 
-[node name="Activity4" type="Button" parent="Activities"]
+[node name="Activity4" parent="Activities" instance=ExtResource("1")]
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
-text = "REST DAY
--7 Fatigue"
+
+[node name="Activity5" parent="Activities" instance=ExtResource("1")]
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
+
+[node name="Activity6" parent="Activities" instance=ExtResource("1")]
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
+
+[node name="Activity7" parent="Activities" instance=ExtResource("1")]
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
+
+[node name="Activity8" parent="Activities" instance=ExtResource("1")]
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
 
 [node name="ConfirmButton" type="Button" parent="."]
 layout_mode = 1
@@ -145,3 +133,5 @@ offset_bottom = 30.0
 grow_horizontal = 2
 text = "CONFIRM TRAINING DAY"
 disabled = true
+
+[node name="TutorialOverlay" parent="." instance=ExtResource("5")]
