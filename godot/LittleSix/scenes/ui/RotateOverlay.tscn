@@ -29,7 +29,6 @@ layout_mode = 2
 
 [node name="RotateIcon" type="TextureRect" parent="CenterContainer/VBoxContainer/IconContainer"]
 layout_mode = 2
-texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 5
 

@@ -22,12 +22,10 @@ func _check_orientation() -> void:
 
 	# Hide overlay if we're in the correct orientation
 	if _target_orientation == DisplayServer.SCREEN_LANDSCAPE:
-		if current_orientation == DisplayServer.SCREEN_LANDSCAPE or \
-		   current_orientation == DisplayServer.SCREEN_LANDSCAPE_FLIPPED:
+		if current_orientation == DisplayServer.SCREEN_LANDSCAPE:
 			hide_overlay()
 	elif _target_orientation == DisplayServer.SCREEN_PORTRAIT:
-		if current_orientation == DisplayServer.SCREEN_PORTRAIT or \
-		   current_orientation == DisplayServer.SCREEN_PORTRAIT_FLIPPED:
+		if current_orientation == DisplayServer.SCREEN_PORTRAIT:
 			hide_overlay()
 
 func set_target_orientation(orientation: int) -> void:

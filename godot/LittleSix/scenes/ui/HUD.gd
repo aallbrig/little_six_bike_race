@@ -24,7 +24,7 @@ func _process(_delta: float) -> void:
     $Speedometer.text = str(current_speed) + "\nMPH"
 
     # Update sprint bar
-    $SprintBar.value = sprint_energy
+    $SprintBar.sprint_energy = sprint_energy
 
     # Update lap counter
     $TopBar/LapCounter.text = "LAP " + str(current_lap) + "/" + str(total_laps)
@@ -65,16 +65,18 @@ func set_sprint_energy(energy: float) -> void:
     sprint_energy = energy
 
 func _apply_safe_area_margins() -> void:
-    if not SafeAreaManager.is_safe_area_supported():
-        return
-
-    var margins = SafeAreaManager.get_safe_margins()
-
-    # For landscape race HUD, adjust right margin for notch
-    $RaceHUD.add_theme_constant_override("margin_right", margins.right + 8)
-
-    # Position elements to avoid safe area
-    if margins.right > 0:
-        # Move speedometer and minimap left to avoid right notch
-        $RaceHUD/Speedometer.position.x -= margins.right * 0.5
-        $RaceHUD/Minimap.position.x -= margins.right
+    # Safe area handling disabled for now to avoid autoload issues
+    # if not SafeAreaManager.is_safe_area_supported():
+    #     return
+    #
+    # var margins = SafeAreaManager.get_safe_margins()
+    #
+    # # For landscape race HUD, adjust right margin for notch
+    # $RaceHUD.add_theme_constant_override("margin_right", margins.right + 8)
+    #
+    # # Position elements to avoid safe area
+    # if margins.right > 0:
+    #     # Move speedometer and minimap left to avoid right notch
+    #     $RaceHUD/Speedometer.position.x -= margins.right * 0.5
+    #     $RaceHUD/Minimap.position.x -= margins.right
+    pass

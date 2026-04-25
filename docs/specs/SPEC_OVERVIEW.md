@@ -25,8 +25,12 @@ Work through specs in this order. Each spec builds on previous ones. Do not star
 | 9 | [Player Progression & Persistence](spec_009_player_progression.md) | Spec 3, 4 | Medium |
 | 10 | [Event Telemetry Logger](spec_010_event_telemetry.md) | Spec 1 | Low |
 | 11 | [Event-Driven Testing Strategy](spec_011_event_driven_testing.md) | Spec 10 | Medium |
-| 12 | [Race Physics & Simulation](spec_010_race_physics_simulation.md) | Spec 4 | High |
-| 13 | [Static Marketing Website & Game Host](spec_011_static_website.md) | Spec 1, 6 | Low |
+| 12 | [Audio System](spec_012_audio_system.md) | Spec 1, 8 | High |
+| 13 | [Dynamic Camera System](spec_013_dynamic_camera.md) | Spec 4 | High |
+| 14 | [Visual Polish & Feedback](spec_014_visual_polish.md) | Spec 7 | Medium |
+| 15 | [Onboarding & Engagement](spec_015_onboarding.md) | Spec 9 | Medium |
+| 16 | [Race Physics & Simulation](spec_010_race_physics_simulation.md) | Spec 4 | High |
+| 17 | [Static Marketing Website & Game Host](spec_011_static_website.md) | Spec 1, 6 | Low |
 
 ---
 
@@ -45,10 +49,14 @@ Use this table to track implementation progress:
 | 007 — Mobile UI/UX | Partially Complete | Component library integrated into TrainingDay, HUD; full scene integration pending |
 | 008 — Audio System | Not started | Sound effects and music implementation |
 | 009 — Progression | Not started | Enhanced save/load system |
-| 010 — Event Telemetry | Not started | EventBus signal monitoring and console logging |
-| 011 — Event-Driven Testing | Not started | GUT test strategy with event focus |
-| 012 — Race Physics | Not started | Advanced physics simulation |
-| 013 — Static Website | Complete | Marketing site with game host, mobile responsive, assets placeholders |
+| 010 — Event Telemetry | Complete | EventBus monitoring with live console output |
+| 011 — Event-Driven Testing | Complete | GUT framework with 60+ UI/control tests |
+| 012 — Audio System | Not started | Critical for engagement (next sprint priority) |
+| 013 — Dynamic Camera | Not started | Will transform racing experience |
+| 014 — Visual Polish | Not started | Makes game feel intentional |
+| 015 — Onboarding | Not started | Reduces learning curve |
+| 016 — Race Physics | Not started | Advanced simulation |
+| 017 — Static Website | Complete | Marketing site with game host, mobile responsive, assets placeholders |
 
 ---
 

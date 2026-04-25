@@ -20,11 +20,16 @@ var bike_physics: BikePhysics
 
 # References
 var draft_detector: Area3D
+var collision_controller: CollisionController
 
 func _ready() -> void:
     # Setup collision
     collision_layer = 1
     collision_mask = 1
+    add_to_group("riders")
+
+    # Get collision controller reference
+    collision_controller = get_parent().get_node_or_null("CollisionController")
 
     # Initialize bike physics
     bike_physics = BikePhysics.new()
@@ -66,35 +71,16 @@ func _physics_process(delta: float) -> void:
     else:
         _player_steering(delta)
 
-    # Sprint energy management
-    if is_sprinting:
-        sprint_energy = max(0.0, sprint_energy - 25.0 * delta)
-        if sprint_energy <= 0:
-            is_sprinting = false
-            EventBus.sprint_exhausted.emit(racer_id)
-    elif sprint_energy < 100.0:
-        sprint_energy = min(100.0, sprint_energy + 15.0 * delta)
-
-    # Update track progress (simplified)
-    track_progress = fmod(track_progress + (current_speed * delta * 0.01), 1.0)
-
-    # Emit position updates for networking
-    if not is_ai:
-        EventBus.racer_position_changed.emit(racer_id, int(track_progress * 100))
-
-func _player_steering(delta: float) -> void:
-    # Player uses input for steering (tilt or buttons)
-    var turn = 0.0
-    if Input.is_action_pressed("steer_left"):
-        turn = -1.0
-    elif Input.is_action_pressed("steer_right"):
-        turn = 1.0
-
-    rotate_y(turn * 2.0 * delta)
-
     # Forward movement along facing direction
     var direction = -transform.basis.z
     velocity = direction * current_speed
+
+    # Apply collision detection
+    if collision_controller:
+        var all_riders = get_tree().get_nodes_in_group("riders")
+        collision_controller.check_rider_collisions(self, all_riders)
+        collision_controller.check_wall_collisions(self, get_parent().get_node_or_null("TrackPath"))
+
     move_and_slide()
 
 func _ai_steering(delta: float) -> void:

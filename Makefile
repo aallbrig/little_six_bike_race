@@ -82,56 +82,52 @@ deploy: ## Full deployment pipeline
 	@./scripts/deploy.sh
 
 # Development environment setup
-dev: ## Start complete development stack (LocalStack + matchmaking + website)
+dev: ## Start complete development stack (matchmaking + website)
 	@echo "🚀 Starting Little Six Development Stack..."
 	@echo ""
 	@echo "📋 Services that will be started:"
-	@echo "   • LocalStack (AWS simulation)"
 	@echo "   • Matchmaking service (Node.js API)"
 	@echo "   • Marketing website (static server)"
+	@echo "   • LocalStack (optional - run 'make localstack' separately)"
 	@echo ""
-	@echo "⚠️  Make sure Docker and Node.js are installed"
+	@echo "⚠️  Make sure Node.js is installed"
+	@echo "💡 For full AWS simulation, run: make localstack"
 	@echo ""
 	@echo "🛑 Press Ctrl+C to stop all services"
 	@echo ""
 	@echo "🌐 URLs when ready:"
-	@echo "   • LocalStack Dashboard: http://localhost:4566"
 	@echo "   • Matchmaking API:      http://localhost:3001"
 	@echo "   • Marketing Website:    http://localhost:8000"
 	@echo "   • Godot Game:           make game"
+	@echo "   • LocalStack (optional): http://localhost:4566"
 	@echo ""
 	@echo "🎯 Starting services..."
 	@echo ""
-	@echo "☁️  1/3 Starting LocalStack..."
-	@./scripts/start-localstack.sh &
-	@echo "⏳ Waiting for LocalStack to initialize..."
-	@sleep 8
-	@echo ""
-	@echo "🎯 2/3 Starting matchmaking service..."
-	@USE_DYNAMODB=true ./scripts/run-matchmaking-service.sh &
+	@echo "🎯 1/2 Starting matchmaking service..."
+	@USE_DYNAMODB=false ./scripts/run-matchmaking-service.sh &
 	@echo "⏳ Waiting for matchmaking to start..."
 	@sleep 5
 	@echo ""
-	@echo "🌐 3/3 Starting website..."
+	@echo "🌐 2/2 Starting website..."
 	@./scripts/start-website.sh &
 	@echo "⏳ Waiting for website to start..."
 	@sleep 2
 	@echo ""
-	@echo "✅ All services started!"
+	@echo "✅ Core services started!"
 	@echo ""
 	@echo "🌐 Development URLs:"
-	@echo "   • LocalStack Dashboard: http://localhost:4566"
 	@echo "   • Matchmaking API:      http://localhost:3001/matchmaking/find"
 	@echo "   • Marketing Website:    http://localhost:8000"
 	@echo "   • Play Game:            make game"
+	@echo "   • LocalStack (if running): http://localhost:4566"
 	@echo ""
-	@echo "🧪 Test the full stack:"
-	@echo "   1. Open http://localhost:8000/play/"
-	@echo "   2. The game should connect to matchmaking"
-	@echo "   3. Check matchmaking logs for API calls"
+	@echo "🧪 Test the stack:"
+	@echo "   1. Check API: curl http://localhost:3001/health"
+	@echo "   2. Open website: http://localhost:8000"
+	@echo "   3. Play game: make game"
 	@echo ""
 	@echo "🔄 Services are running in background."
-	@echo "🛑 Use 'pkill -f \"node\|python\|docker\"' to stop all services"
+	@echo "🛑 Use 'pkill -f \"node\|python\"' to stop services"
 	@echo ""
 	@trap 'echo ""; echo "🛑 Stopping services..."; pkill -f "node.*matchmaking\|python.*http\.server\|serve" 2>/dev/null; echo "✅ Services stopped"; exit' INT
 	@wait

@@ -24,21 +24,20 @@ fi
 
 if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
     echo "❌ Error: Docker Compose not found. Please install Docker Compose."
+    echo "   On newer systems, try: apt install docker-compose-plugin"
     exit 1
 fi
 
 cd "$PROJECT_ROOT/infra/localstack"
-
-# Check if LocalStack is already running
-if docker ps | grep -q localstack; then
-    echo "⚠️  LocalStack is already running"
-    echo "   Stop it first with: docker-compose down"
-    exit 1
-fi
 
 echo "🚀 Starting LocalStack services..."
 echo "   - LocalStack API: http://localhost:4566"
 echo "   - Services: Lambda, DynamoDB, API Gateway"
 echo "   - Press Ctrl+C to stop"
 
-exec docker-compose up
+# Try docker compose first (newer syntax), fallback to docker-compose
+if docker compose version &> /dev/null; then
+    exec docker compose up
+else
+    exec docker-compose up
+fi

@@ -25,9 +25,9 @@ class_name Settings
 var current_text_scale: String = "medium"
 
 func _ready() -> void:
-	# Apply safe area margins for mobile
-	if SafeAreaManager.is_safe_area_supported():
-		SafeAreaManager.apply_safe_area_to_container($Panel/ScrollContainer)
+	# Apply safe area margins for mobile (disabled for now)
+	# if SafeAreaManager.is_safe_area_supported():
+	# 	SafeAreaManager.apply_safe_area_to_container($Panel/ScrollContainer)
 
 	# Load saved settings
 	load_settings()
