@@ -14,6 +14,36 @@ point_count = 6
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(8, 0.2, 160)
 
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sprint"]
+lifetime_randomness = 0.2
+emission_shape = 1
+emission_sphere_radius = 0.5
+direction = Vector3(0, 0, -1)
+spread = 30.0
+gravity = Vector3(0, -5, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
+color = Color(0.5, 0.8, 1, 0.8)
+
+[sub_resource type="SphereMesh" id="SphereMesh_sprint"]
+radius = 0.05
+height = 0.1
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dust"]
+lifetime_randomness = 0.5
+emission_shape = 1
+emission_sphere_radius = 1.0
+direction = Vector3(0, 0.5, 0)
+spread = 45.0
+gravity = Vector3(0, -2, 0)
+initial_velocity_min = 1.0
+initial_velocity_max = 3.0
+color = Color(0.8, 0.6, 0.4, 0.6)
+
+[sub_resource type="SphereMesh" id="SphereMesh_dust"]
+radius = 0.03
+height = 0.06
+
 [node name="RaceTrack" type="Node3D"]
 script = ExtResource("1")
 
@@ -32,6 +62,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("3")
 metadata/is_player = true
 metadata/racer_id = 0
+
+[node name="SprintTrail" type="GPUParticles3D" parent="Riders/PlayerRider"]
+emitting = false
+amount = 50
+lifetime = 0.5
+one_shot = false
+explosiveness = 0.0
+randomness = 0.1
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_sprint")
+draw_pass_1 = SubResource("SphereMesh_sprint")
+
+[node name="DustTrail" type="GPUParticles3D" parent="Riders/PlayerRider"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+emitting = false
+amount = 30
+lifetime = 1.0
+one_shot = false
+explosiveness = 0.2
+randomness = 0.3
+fixed_fps = 30
+process_material = SubResource("ParticleProcessMaterial_dust")
+draw_pass_1 = SubResource("SphereMesh_dust")
 
 [node name="RaceCamera" type="Node3D" parent="." node_paths=PackedStringArray("target_rider")]
 script = ExtResource("2")

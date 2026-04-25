@@ -1,32 +1,40 @@
-[gd_scene load_steps=2 format=3 uid="uid://stat-bar-component"]
+[gd_scene load_steps=3 format=3 uid="uid://stat-bar-component"]
 
 [ext_resource type="Script" path="res://scenes/ui/components/StatBar.gd" id="1"]
+[ext_resource type="Theme" uid="uid://little-six-theme" path="res://assets/ui/LittleSixTheme.tres" id="2"]
 
 [node name="StatBar" type="HBoxContainer"]
-custom_minimum_size = Vector2(200, 32)
 script = ExtResource("1")
+theme = ExtResource("2")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
-size_flags_horizontal = 0
-custom_minimum_size = Vector2(100, 0)
-text = "STAT NAME"
-horizontal_alignment = 1
-vertical_alignment = 1
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 16
+text = "STAT"
 
 [node name="ProgressBar" type="ProgressBar" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 4
-custom_minimum_size = Vector2(0, 12)
 max_value = 100.0
-step = 1.0
-show_percentage = false
+theme_override_styles/fill = SubResource("StyleBoxFlat_progress")
 
 [node name="ValueLabel" type="Label" parent="."]
 layout_mode = 2
-size_flags_horizontal = 0
-custom_minimum_size = Vector2(36, 0)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
 text = "0"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress"]
+bg_color = Color(0.2, 0.4, 0.8, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.6, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 horizontal_alignment = 2
 vertical_alignment = 1
