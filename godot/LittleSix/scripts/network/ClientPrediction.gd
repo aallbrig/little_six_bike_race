@@ -8,7 +8,7 @@ signal prediction_error_detected(error_data: Dictionary)
 signal prediction_corrected(correction_data: Dictionary)
 
 const PREDICTION_BUFFER_SIZE = 60  # 1 second at 60 FPS
-const MAX_CORRECTION_DISTANCE = 5.0  # Meters before snapping
+const MAX_CORRECTION_DISTANCE = 5.0	 # Meters before snapping
 const SMOOTHING_FACTOR = 0.1  # How aggressively to correct predictions
 
 var _prediction_buffer: Array[Dictionary] = []

@@ -50,11 +50,11 @@ func test_sprint_bar_partial_energy():
 	var test_values = [0.0, 25.5, 50.0, 77.3, 100.0]
 
 	for value in test_values:
-	    sprint_bar.sprint_energy = value
+		sprint_bar.sprint_energy = value
 
-	    # Then: Should accurately reflect the value
-	    assert_eq(sprint_bar.sprint_energy, value)
-	    assert_eq(sprint_bar.get_node("ProgressBar").value, value)
+		# Then: Should accurately reflect the value
+		assert_eq(sprint_bar.sprint_energy, value)
+		assert_eq(sprint_bar.get_node("ProgressBar").value, value)
 
 func test_sprint_bar_float_precision():
 	# Given: SprintBar ready
@@ -72,12 +72,12 @@ func test_sprint_bar_range_validation():
 	var edge_cases = [-999, -1, 0, 1, 99, 100, 101, 999]
 
 	for value in edge_cases:
-	    sprint_bar.sprint_energy = value
+		sprint_bar.sprint_energy = value
 
-	    # Should always be between 0 and 100
-	    assert_gte(sprint_bar.sprint_energy, 0.0, "Energy should never be negative")
-	    assert_lte(sprint_bar.sprint_energy, 100.0, "Energy should never exceed 100")
-	    assert_eq(sprint_bar.get_node("ProgressBar").value, sprint_bar.sprint_energy, "Bar should match energy value")
+		# Should always be between 0 and 100
+		assert_gte(sprint_bar.sprint_energy, 0.0, "Energy should never be negative")
+		assert_lte(sprint_bar.sprint_energy, 100.0, "Energy should never exceed 100")
+		assert_eq(sprint_bar.get_node("ProgressBar").value, sprint_bar.sprint_energy, "Bar should match energy value")
 
 func test_sprint_bar_initialization_with_custom_value():
 	# Given: New SprintBar with custom initial energy

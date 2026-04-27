@@ -19,11 +19,11 @@ func test_touch_zones_detection():
 	var viewport_size = Vector2(1080, 1920)
 
 	# Sprint zone: top-right quadrant
-	var sprint_pos = Vector2(900, 240)  # x > 810, y < 480
+	var sprint_pos = Vector2(900, 240)	# x > 810, y < 480
 	assert_true(input_overlay._is_in_sprint_zone(sprint_pos, viewport_size.x, viewport_size.y))
 
 	# Brake zone: bottom-right
-	var brake_pos = Vector2(900, 1600)  # x > 810, y > 1440
+	var brake_pos = Vector2(900, 1600)	# x > 810, y > 1440
 	assert_true(input_overlay._is_in_brake_zone(brake_pos, viewport_size.x, viewport_size.y))
 
 	# Exchange zone: center-bottom

@@ -11,19 +11,19 @@ static func get_safe_margins() -> Dictionary:
 	var screen_size = DisplayServer.window_get_size()
 
 	return {
-	    "top": safe_area.position.y,
-	    "bottom": screen_size.y - (safe_area.position.y + safe_area.size.y),
-	    "left": safe_area.position.x,
-	    "right": screen_size.x - (safe_area.position.x + safe_area.size.x)
+		"top": safe_area.position.y,
+		"bottom": screen_size.y - (safe_area.position.y + safe_area.size.y),
+		"left": safe_area.position.x,
+		"right": screen_size.x - (safe_area.position.x + safe_area.size.x)
 	}
 
 static func apply_safe_area_to_container(container: Control, include_top: bool = true, include_bottom: bool = true) -> void:
 	var margins = get_safe_margins()
 
 	if include_top:
-	    container.add_theme_constant_override("margin_top", margins.top + 8)
+		container.add_theme_constant_override("margin_top", margins.top + 8)
 	if include_bottom:
-	    container.add_theme_constant_override("margin_bottom", margins.bottom + 8)
+		container.add_theme_constant_override("margin_bottom", margins.bottom + 8)
 
 	container.add_theme_constant_override("margin_left", margins.left + 8)
 	container.add_theme_constant_override("margin_right", margins.right + 8)

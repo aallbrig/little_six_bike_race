@@ -14,7 +14,7 @@ func test_telemetry_logger_initializes_and_connects_to_signals():
 	# Given: TelemetryLogger is added to scene tree
 	# When: _ready() is called
 	# Then: Logger connects to all EventBus signals (we can't easily test all connections,
-	#       but we can verify the logger exists and has expected methods)
+	#		but we can verify the logger exists and has expected methods)
 	assert_not_null(telemetry_logger, "TelemetryLogger should be instantiated")
 	assert_has_method(telemetry_logger, "set_enabled", "Should have enable/disable method")
 	assert_has_method(telemetry_logger, "set_log_level", "Should have log level control")

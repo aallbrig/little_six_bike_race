@@ -1,0 +1,44 @@
+[gd_resource type="AudioBusLayout" load_steps=2 format=3 uid="uid://d1q8j8k8k8k8"]
+
+[ext_resource type="AudioEffectReverb" uid="uid://b2q8j8k8k8k8" path="res://effects/music_reverb.tres" id="1"]
+[ext_resource type="AudioEffectReverb" uid="uid://c3q8j8k8k8k8" path="res://effects/crowd_reverb.tres" id="2"]
+
+[resource]
+bus/0/name = "Master"
+bus/0/solo = false
+bus/0/mute = false
+bus/0/bypass_fx = false
+bus/0/volume_db = 0.0
+bus/0/send = "Master"
+
+bus/1/name = "Music"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = -3.0
+bus/1/send = "Master"
+bus/1/effect/0/effect = ExtResource("1")
+bus/1/effect/0/enabled = true
+
+bus/2/name = "SFX"
+bus/2/solo = false
+bus/2/mute = false
+bus/2/bypass_fx = false
+bus/2/volume_db = 0.0
+bus/2/send = "Master"
+
+bus/3/name = "Crowd"
+bus/3/solo = false
+bus/3/mute = false
+bus/3/bypass_fx = false
+bus/3/volume_db = -6.0
+bus/3/send = "Master"
+bus/3/effect/0/effect = ExtResource("2")
+bus/3/effect/0/enabled = true
+
+bus/4/name = "UI"
+bus/4/solo = false
+bus/4/mute = false
+bus/4/bypass_fx = false
+bus/4/volume_db = 0.0
+bus/4/send = "Master"

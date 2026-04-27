@@ -18,13 +18,13 @@ func _ready() -> void:
 
 func _on_sprint_pressed(pressed: bool) -> void:
 	if sprint_trail:
-	    sprint_trail.emitting = pressed
+		sprint_trail.emitting = pressed
 	if speed_lines:
-	    speed_lines.emitting = pressed
+		speed_lines.emitting = pressed
 
 func _on_brake_pressed(pressed: bool) -> void:
 	if dust_trail:
-	    dust_trail.emitting = pressed
+		dust_trail.emitting = pressed
 
 func _on_race_started() -> void:
 	# Brief celebration effect
@@ -45,10 +45,10 @@ func _play_start_effect() -> void:
 func _play_finish_effect() -> void:
 	# Victory particles
 	if sprint_trail:
-	    sprint_trail.emitting = true
-	    # Auto-disable after celebration
-	    await get_tree().create_timer(3.0).wait
-	    sprint_trail.emitting = false
+		sprint_trail.emitting = true
+		# Auto-disable after celebration
+		await get_tree().create_timer(3.0).wait
+		sprint_trail.emitting = false
 
 func _play_crash_effect() -> void:
 	# Crash debris particles
@@ -56,5 +56,5 @@ func _play_crash_effect() -> void:
 
 func _set_all_effects_visible(visible: bool) -> void:
 	for child in get_children():
-	    if child is GPUParticles3D:
-	        child.emitting = visible
+		if child is GPUParticles3D:
+			child.emitting = visible

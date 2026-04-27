@@ -7,19 +7,19 @@ extends Resource
 @export var is_race_week: bool = false
 @export var qualifying_time: float = 0.0
 @export var qualifying_position: int = 0
-@export var weeks_completed: Array = []  # Array of WeekData
+@export var weeks_completed: Array = []	 # Array of WeekData
 @export var spring_series_results: Array = []  # Array of EventResult
 
 func to_dict() -> Dictionary:
 	return {
-	    "season_id": season_id,
-	    "current_week": current_week,
-	    "current_day": current_day,
-	    "is_race_week": is_race_week,
-	    "qualifying_time": qualifying_time,
-	    "qualifying_position": qualifying_position,
-	    "weeks_completed": weeks_completed,
-	    "spring_series_results": spring_series_results
+		"season_id": season_id,
+		"current_week": current_week,
+		"current_day": current_day,
+		"is_race_week": is_race_week,
+		"qualifying_time": qualifying_time,
+		"qualifying_position": qualifying_position,
+		"weeks_completed": weeks_completed,
+		"spring_series_results": spring_series_results
 	}
 
 static func from_dict(d: Dictionary) -> SeasonData:

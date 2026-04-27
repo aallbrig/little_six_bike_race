@@ -44,10 +44,10 @@ Use this table to track implementation progress:
 | 002 — Attract Mode | Complete | Logo, Cinematic, Title, Demo scenes with iris transitions and loop |
 | 003 — Training System | Complete | Tamagotchi mechanics, activity selection, stat progression, random events |
 | 004 — Multiplayer Race | Complete | RaceController, RiderController, physics, lap tracking, AI opponents |
-| 005 — Networking | Not started | Real-time multiplayer infrastructure |
+| 005 — Networking | Complete | WebSocket client, matchmaking, input sync, world state reconciliation, lobby/room select |
 | 006 — AWS Infrastructure | Not started | Cloud deployment and backend services |
 | 007 — Mobile UI/UX | Partially Complete | Component library integrated into TrainingDay, HUD; full scene integration pending |
-| 008 — Audio System | Not started | Sound effects and music implementation |
+| 008 — Audio System | Complete | AudioManager, bus layout, SFX pool, crowd audio, pedal audio |
 | 009 — Progression | Not started | Enhanced save/load system |
 | 010 — Event Telemetry | Complete | EventBus monitoring with live console output |
 | 011 — Event-Driven Testing | Complete | GUT framework with 60+ UI/control tests |

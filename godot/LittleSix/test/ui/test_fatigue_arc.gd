@@ -25,34 +25,34 @@ func test_fatigue_arc_fresh_state():
 	var test_values = [0, 15, 30]
 
 	for value in test_values:
-	    fatigue_arc.fatigue = value
+		fatigue_arc.fatigue = value
 
-	    # Then: Should show "FRESH" and be green
-	    assert_eq(fatigue_arc.get_node("Label").text, "FRESH")
-	    # Visual state tested via drawing, but we can verify value is set
-	    assert_eq(fatigue_arc.fatigue, value)
+		# Then: Should show "FRESH" and be green
+		assert_eq(fatigue_arc.get_node("Label").text, "FRESH")
+		# Visual state tested via drawing, but we can verify value is set
+		assert_eq(fatigue_arc.fatigue, value)
 
 func test_fatigue_arc_tired_state():
 	# Given: Medium fatigue values
 	var test_values = [31, 50, 70]
 
 	for value in test_values:
-	    fatigue_arc.fatigue = value
+		fatigue_arc.fatigue = value
 
-	    # Then: Should show "TIRED"
-	    assert_eq(fatigue_arc.get_node("Label").text, "TIRED")
-	    assert_eq(fatigue_arc.fatigue, value)
+		# Then: Should show "TIRED"
+		assert_eq(fatigue_arc.get_node("Label").text, "TIRED")
+		assert_eq(fatigue_arc.fatigue, value)
 
 func test_fatigue_arc_overloaded_state():
 	# Given: High fatigue values
 	var test_values = [71, 85, 100]
 
 	for value in test_values:
-	    fatigue_arc.fatigue = value
+		fatigue_arc.fatigue = value
 
-	    # Then: Should show "OVERLOADED"
-	    assert_eq(fatigue_arc.get_node("Label").text, "OVERLOADED")
-	    assert_eq(fatigue_arc.fatigue, value)
+		# Then: Should show "OVERLOADED"
+		assert_eq(fatigue_arc.get_node("Label").text, "OVERLOADED")
+		assert_eq(fatigue_arc.fatigue, value)
 
 func test_fatigue_arc_value_clamping():
 	# Given: FatigueArc ready
@@ -111,7 +111,7 @@ func test_fatigue_arc_arc_drawing_calculation():
 	# Calculate expected arc properties
 	var center = fatigue_arc.size / 2
 	var radius = min(fatigue_arc.size.x, fatigue_arc.size.y) / 2 - 10
-	var expected_angle_to = -PI/2 + (50.0 / 100.0) * 2 * PI  # 50% = PI radians
+	var expected_angle_to = -PI/2 + (50.0 / 100.0) * 2 * PI	 # 50% = PI radians
 
 	# We can't directly test drawing, but we can verify the component
 	# handles the calculation inputs correctly
@@ -125,56 +125,56 @@ func test_fatigue_arc_arc_drawing_calculation():
 func test_fatigue_arc_color_zones():
 	# Test color determination logic
 	var test_cases = [
-	    [0, "FRESH"],
-	    [25, "FRESH"],
-	    [30, "FRESH"],   # Boundary
-	    [31, "TIRED"],
-	    [50, "TIRED"],
-	    [70, "TIRED"],   # Boundary
-	    [71, "OVERLOADED"],
-	    [85, "OVERLOADED"],
-	    [100, "OVERLOADED"]
+		[0, "FRESH"],
+		[25, "FRESH"],
+		[30, "FRESH"],	 # Boundary
+		[31, "TIRED"],
+		[50, "TIRED"],
+		[70, "TIRED"],	 # Boundary
+		[71, "OVERLOADED"],
+		[85, "OVERLOADED"],
+		[100, "OVERLOADED"]
 	]
 
 	for test_case in test_cases:
-	    var fatigue_value = test_case[0]
-	    var expected_label = test_case[1]
+		var fatigue_value = test_case[0]
+		var expected_label = test_case[1]
 
-	    fatigue_arc.fatigue = fatigue_value
-	    assert_eq(fatigue_arc.get_node("Label").text, expected_label,
-	             "Fatigue " + str(fatigue_value) + " should show " + expected_label)
+		fatigue_arc.fatigue = fatigue_value
+		assert_eq(fatigue_arc.get_node("Label").text, expected_label,
+				 "Fatigue " + str(fatigue_value) + " should show " + expected_label)
 
 func test_fatigue_arc_boundary_transitions():
 	# Test exact boundary values
 	var boundaries = [30, 70]
 
 	for boundary in boundaries:
-	    # Test just below boundary
-	    fatigue_arc.fatigue = boundary - 1
-	    var below_label = fatigue_arc.get_node("Label").text
+		# Test just below boundary
+		fatigue_arc.fatigue = boundary - 1
+		var below_label = fatigue_arc.get_node("Label").text
 
-	    # Test exactly at boundary
-	    fatigue_arc.fatigue = boundary
-	    var at_label = fatigue_arc.get_node("Label").text
+		# Test exactly at boundary
+		fatigue_arc.fatigue = boundary
+		var at_label = fatigue_arc.get_node("Label").text
 
-	    # Test just above boundary
-	    fatigue_arc.fatigue = boundary + 1
-	    var above_label = fatigue_arc.get_node("Label").text
+		# Test just above boundary
+		fatigue_arc.fatigue = boundary + 1
+		var above_label = fatigue_arc.get_node("Label").text
 
-	    # Verify transitions work correctly
-	    if boundary == 30:
-	        assert_eq(below_label, "FRESH")
-	        assert_eq(at_label, "FRESH")  # 30 is still FRESH
-	        assert_eq(above_label, "TIRED")
-	    elif boundary == 70:
-	        assert_eq(below_label, "TIRED")
-	        assert_eq(at_label, "TIRED")  # 70 is still TIRED
-	        assert_eq(above_label, "OVERLOADED")
+		# Verify transitions work correctly
+		if boundary == 30:
+			assert_eq(below_label, "FRESH")
+			assert_eq(at_label, "FRESH")  # 30 is still FRESH
+			assert_eq(above_label, "TIRED")
+		elif boundary == 70:
+			assert_eq(below_label, "TIRED")
+			assert_eq(at_label, "TIRED")  # 70 is still TIRED
+			assert_eq(above_label, "OVERLOADED")
 
 func test_fatigue_arc_initialization():
 	# Given: New FatigueArc with custom initial values
 	var custom_arc = FatigueArc.new()
-	custom_arc.fatigue = 65  # Should be TIRED
+	custom_arc.fatigue = 65	 # Should be TIRED
 	add_child(custom_arc)
 	custom_arc.size = Vector2(150, 150)
 	await get_tree().create_timer(0.1).wait

@@ -35,7 +35,7 @@ func test_stat_bar_value_change_animates():
 	stat_bar.value = 80
 
 	# Then: Should animate to new value
-	await get_tree().create_timer(0.5).wait  # Wait for animation
+	await get_tree().create_timer(0.5).wait	 # Wait for animation
 	assert_eq(stat_bar.get_node("ProgressBar").value, 80)
 	assert_eq(stat_bar.get_node("ValueLabel").text, "80")
 
@@ -74,7 +74,7 @@ func test_stat_bar_positive_delta_display():
 	var initial_child_count = get_tree().root.get_child_count()
 
 	# When: Value increases
-	stat_bar.value = 60  # from default 0
+	stat_bar.value = 60	 # from default 0
 
 	# Then: Should show positive delta label
 	await get_tree().create_timer(0.1).wait
@@ -82,11 +82,11 @@ func test_stat_bar_positive_delta_display():
 	# Find delta label in scene root
 	var delta_found = false
 	for child in get_tree().root.get_children():
-	    if child is Label and child.text.begins_with("+"):
-	        delta_found = true
-	        assert_eq(child.text, "+60")
-	        assert_eq(child.modulate, Color.GREEN)
-	        break
+		if child is Label and child.text.begins_with("+"):
+			delta_found = true
+			assert_eq(child.text, "+60")
+			assert_eq(child.modulate, Color.GREEN)
+			break
 
 	assert_true(delta_found, "Should create positive delta label")
 
@@ -102,11 +102,11 @@ func test_stat_bar_negative_delta_display():
 
 	var delta_found = false
 	for child in get_tree().root.get_children():
-	    if child is Label and child.text.begins_with("-"):
-	        delta_found = true
-	        assert_eq(child.text, "-20")
-	        assert_eq(child.modulate, Color.RED)
-	        break
+		if child is Label and child.text.begins_with("-"):
+			delta_found = true
+			assert_eq(child.text, "-20")
+			assert_eq(child.modulate, Color.RED)
+			break
 
 	assert_true(delta_found, "Should create negative delta label")
 
@@ -141,7 +141,7 @@ func test_stat_bar_color_change_updates_bar():
 	# Then: ProgressBar should use new color
 	var style = stat_bar.get_node("ProgressBar").get_theme_stylebox("fill")
 	if style and style.has_method("get_bg_color"):
-	    assert_eq(style.bg_color, new_color)
+		assert_eq(style.bg_color, new_color)
 
 func test_stat_bar_delta_label_animation():
 	# Given: StatBar ready
@@ -154,9 +154,9 @@ func test_stat_bar_delta_label_animation():
 
 	var delta_label = null
 	for child in get_tree().root.get_children():
-	    if child is Label and child.text == "+30":
-	        delta_label = child
-	        break
+		if child is Label and child.text == "+30":
+			delta_label = child
+			break
 
 	assert_not_null(delta_label, "Should create delta label")
 
@@ -170,9 +170,9 @@ func test_stat_bar_delta_label_animation():
 	# Label should be freed by animation completion
 	var still_exists = false
 	for child in get_tree().root.get_children():
-	    if child == delta_label:
-	        still_exists = true
-	        break
+		if child == delta_label:
+			still_exists = true
+			break
 
 	assert_false(still_exists, "Delta label should be freed after animation")
 

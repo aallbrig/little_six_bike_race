@@ -157,7 +157,7 @@ func _get_max_latency() -> float:
 func _calculate_bytes_per_second() -> float:
 	"""Calculate current bytes per second (simplified)"""
 	# This would need proper tracking of bytes over time intervals
-	return 0.0  # Placeholder
+	return 0.0	# Placeholder
 
 func record_bytes_sent(bytes: int) -> void:
 	"""Record bytes sent for telemetry"""

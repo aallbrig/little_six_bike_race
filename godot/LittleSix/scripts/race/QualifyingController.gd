@@ -9,7 +9,7 @@ class_name QualifyingController
 # Qualifying state
 var qual_start_time: float = 0.0
 var lap_times: Array[float] = []
-var ghost_data: Array = []  # Array of position data for ghost rider
+var ghost_data: Array = []	# Array of position data for ghost rider
 var personal_best: float = 999999.0
 
 # References
@@ -35,7 +35,7 @@ func start_qualifying() -> void:
 
 func _on_lap_completed(racer_id: int, lap_number: int, lap_time: float) -> void:
 	"""Handle lap completion during qualifying"""
-	if not is_qualifying or racer_id != 0:  # Only track player (racer_id 0)
+	if not is_qualifying or racer_id != 0:	# Only track player (racer_id 0)
 		return
 
 	lap_times.append(lap_time)

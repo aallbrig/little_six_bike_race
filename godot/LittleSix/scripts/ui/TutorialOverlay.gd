@@ -17,36 +17,36 @@ signal step_advanced
 
 const TUTORIAL_STEPS = [
 	{
-	    "title": "Welcome to Little Six!",
-	    "description": "You're about to embark on an epic cycling journey to win the Little 500! Let's get you started with your first training day.",
-	    "highlight": null
+		"title": "Welcome to Little Six!",
+		"description": "You're about to embark on an epic cycling journey to win the Little 500! Let's get you started with your first training day.",
+		"highlight": null
 	},
 	{
-	    "title": "Your Training Activities",
-	    "description": "These cards represent different training activities. Each one gives different stat boosts but costs fatigue. Choose wisely!",
-	    "highlight": "ActivityCard"
+		"title": "Your Training Activities",
+		"description": "These cards represent different training activities. Each one gives different stat boosts but costs fatigue. Choose wisely!",
+		"highlight": "ActivityCard"
 	},
 	{
-	    "title": "Understanding Fatigue",
-	    "description": "Watch your fatigue level - if it gets too high, you'll be limited to recovery activities. Balance is key!",
-	    "highlight": "FatigueArc"
+		"title": "Understanding Fatigue",
+		"description": "Watch your fatigue level - if it gets too high, you'll be limited to recovery activities. Balance is key!",
+		"highlight": "FatigueArc"
 	},
 	{
-	    "title": "Track Your Progress",
-	    "description": "Your stats determine your race performance. Speed, Endurance, and Handling are crucial for victory.",
-	    "highlight": "StatBar"
+		"title": "Track Your Progress",
+		"description": "Your stats determine your race performance. Speed, Endurance, and Handling are crucial for victory.",
+		"highlight": "StatBar"
 	},
 	{
-	    "title": "Complete Your Training",
-	    "description": "Select 3 activities for your first training day. Ready to start your Little 500 journey?",
-	    "highlight": null
+		"title": "Complete Your Training",
+		"description": "Select 3 activities for your first training day. Ready to start your Little 500 journey?",
+		"highlight": null
 	}
 ]
 
 func _ready() -> void:
 	if not tutorial_active:
-	    hide_tutorial()
-	    return
+		hide_tutorial()
+		return
 
 	setup_tutorial()
 	show_current_step()
@@ -61,10 +61,10 @@ func setup_tutorial() -> void:
 func _on_next_pressed() -> void:
 	current_step += 1
 	if current_step >= TUTORIAL_STEPS.size():
-	    complete_tutorial()
+		complete_tutorial()
 	else:
-	    show_current_step()
-	    step_advanced.emit()
+		show_current_step()
+		step_advanced.emit()
 
 func _on_skip_pressed() -> void:
 	complete_tutorial()
@@ -72,12 +72,12 @@ func _on_skip_pressed() -> void:
 func _on_activity_chosen(_activity: int, _slot: int) -> void:
 	# If player has chosen activities, advance tutorial
 	if current_step < TUTORIAL_STEPS.size() - 1:
-	    current_step = TUTORIAL_STEPS.size() - 1
-	    show_current_step()
+		current_step = TUTORIAL_STEPS.size() - 1
+		show_current_step()
 
 func show_current_step() -> void:
 	if current_step >= TUTORIAL_STEPS.size():
-	    return
+		return
 
 	var step = TUTORIAL_STEPS[current_step]
 	title_label.text = step.title
@@ -85,9 +85,9 @@ func show_current_step() -> void:
 
 	# Update button text
 	if current_step == TUTORIAL_STEPS.size() - 1:
-	    next_button.text = "Start Training!"
+		next_button.text = "Start Training!"
 	else:
-	    next_button.text = "Next"
+		next_button.text = "Next"
 
 	panel.visible = true
 	modulate.a = 1.0

@@ -15,8 +15,8 @@ func update_rider_positions(positions: Array) -> void:
 	for i in range(min(positions.size(), rider_dots.size())):
 		var pos = positions[i]
 		# Convert world position to minimap UV coordinates (0-1)
-		var uv_x = (pos.x + 50) / 100.0  # Assuming track bounds -50 to 50
-		var uv_y = (pos.z + 80) / 160.0  # Assuming track bounds -80 to 80
+		var uv_x = (pos.x + 50) / 100.0	 # Assuming track bounds -50 to 50
+		var uv_y = (pos.z + 80) / 160.0	 # Assuming track bounds -80 to 80
 
 		rider_dots[i].position = Vector2(uv_x * size.x, uv_y * size.y)
 		rider_dots[i].visible = true

@@ -46,7 +46,7 @@ func _update_border() -> void:
 	if is_selected:
 		# Add crimson border
 		var style = StyleBoxFlat.new()
-		style.bg_color = Color(0.701961, 0.105882, 0.105882, 1)  # Crimson
+		style.bg_color = Color(0.701961, 0.105882, 0.105882, 1)	 # Crimson
 		style.border_width_left = 3
 		style.border_width_top = 3
 		style.border_width_right = 3

@@ -12,7 +12,7 @@ func _ready() -> void:
 func _draw() -> void:
 	var center = size / 2
 	var radius = min(size.x, size.y) / 2 - 10
-	var angle_from = -PI/2  # Start from top
+	var angle_from = -PI/2	# Start from top
 	var angle_to = angle_from + (fatigue / 100.0) * 2 * PI
 
 	# Choose color based on fatigue level

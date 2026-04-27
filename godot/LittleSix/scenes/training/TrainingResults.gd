@@ -20,28 +20,28 @@ func _on_random_event_fired(event_id: String, effects: Dictionary) -> void:
 func _update_display(week: int, day: int) -> void:
 	var racer = TrainingManager._get_current_racer()
 	if not racer:
-	    return
+		return
 
 	var summary_text = "WEEK %d, DAY %d COMPLETE\n\n" % [week, day]
 
 	# Show stat changes
 	var stat_names = ["speed", "endurance", "recovery", "handling", "team_chem", "fatigue", "morale"]
 	for stat in stat_names:
-	    var total_change = 0
-	    for activity_summary in _training_summary.values():
-	        total_change += activity_summary.get(stat, 0)
+		var total_change = 0
+		for activity_summary in _training_summary.values():
+			total_change += activity_summary.get(stat, 0)
 
-	    if total_change != 0:
-	        var sign = "+" if total_change > 0 else ""
-	        var current_value = racer.get(stat)
-	        summary_text += "%s: %s%d (%d)\n" % [stat.capitalize(), sign, total_change, current_value]
+		if total_change != 0:
+			var sign = "+" if total_change > 0 else ""
+			var current_value = racer.get(stat)
+			summary_text += "%s: %s%d (%d)\n" % [stat.capitalize(), sign, total_change, current_value]
 
 	# Show random event if any
 	if not _random_event.is_empty():
-	    summary_text += "\nRandom Event: %s\n%s" % [
-	        _random_event.id.capitalize().replace("_", " "),
-	        _random_event.effects.get("description", "")
-	    ]
+		summary_text += "\nRandom Event: %s\n%s" % [
+			_random_event.id.capitalize().replace("_", " "),
+			_random_event.effects.get("description", "")
+		]
 
 	# Show race form
 	summary_text += "\n\nRace Form: %s" % racer.get_race_form()

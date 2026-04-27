@@ -19,7 +19,7 @@ func _ready() -> void:
 	_setup_pun_timer()
 	# Ensure nodes are accessible
 	if has_node("CenterContainer/VBoxContainer/LoadingLabel"):
-	    $CenterContainer/VBoxContainer/LoadingLabel.text = "Loading..."
+		$CenterContainer/VBoxContainer/LoadingLabel.text = "Loading..."
 
 func _setup_pun_timer() -> void:
 	_pun_timer = Timer.new()
@@ -29,9 +29,9 @@ func _setup_pun_timer() -> void:
 
 func show_loading(message: String = "") -> void:
 	if message.is_empty():
-	    _cycle_pun()
+		_cycle_pun()
 	else:
-	    $CenterContainer/VBoxContainer/LoadingLabel.text = message
+		$CenterContainer/VBoxContainer/LoadingLabel.text = message
 
 	visible = true
 	_pun_timer.start()
@@ -43,7 +43,7 @@ func show_loading(message: String = "") -> void:
 func hide_loading() -> void:
 	visible = false
 	if _pun_timer:
-	    _pun_timer.stop()
+		_pun_timer.stop()
 	_current_pun_index = 0
 
 func _cycle_pun() -> void:

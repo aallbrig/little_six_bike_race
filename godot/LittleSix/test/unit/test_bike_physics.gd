@@ -67,7 +67,7 @@ func test_aerodynamic_drag_increases_with_speed():
 
 func test_terminal_velocity_reached():
 	# Given: Bike pedaling at high speed
-	physics_calculator.velocity = 20.0  # Above expected terminal velocity
+	physics_calculator.velocity = 20.0	# Above expected terminal velocity
 	physics_calculator.is_pedaling = true
 	physics_calculator.is_braking = false
 

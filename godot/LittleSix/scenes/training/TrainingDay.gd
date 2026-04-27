@@ -4,29 +4,45 @@ var selected_slot = -1
 var activity_buttons = []
 
 func _ready() -> void:
+	# Handle safe area for mobile notch/home indicator
+	_apply_safe_area()
+
 	# Connect all activity cards
 	activity_buttons = [
-	    $Activities/Activity1, $Activities/Activity2, $Activities/Activity3, $Activities/Activity4,
-	    $Activities/Activity5, $Activities/Activity6, $Activities/Activity7, $Activities/Activity8
+		$Activities/Activity1, $Activities/Activity2, $Activities/Activity3, $Activities/Activity4,
+		$Activities/Activity5, $Activities/Activity6, $Activities/Activity7, $Activities/Activity8
 	]
 
 	var activity_types = [
-	    TrainingActivity.SPRINT_INTERVALS,
-	    TrainingActivity.LONG_RIDE,
-	    TrainingActivity.STRENGTH_WORK,
-	    TrainingActivity.VIDEO_STUDY,
-	    TrainingActivity.TEAM_MEETING,
-	    TrainingActivity.NUTRITION_PLAN,
-	    TrainingActivity.RECOVERY_SPIN,
-	    TrainingActivity.REST_DAY
+		TrainingActivity.SPRINT_INTERVALS,
+		TrainingActivity.LONG_RIDE,
+		TrainingActivity.STRENGTH_WORK,
+		TrainingActivity.VIDEO_STUDY,
+		TrainingActivity.TEAM_MEETING,
+		TrainingActivity.NUTRITION_PLAN,
+		TrainingActivity.RECOVERY_SPIN,
+		TrainingActivity.REST_DAY
 	]
 
 	for i in activity_buttons.size():
-	    var card = activity_buttons[i]
-	    card.activity_type = activity_types[i]
-	    card.card_tapped.connect(func(type): _on_activity_selected(i))
+		var card = activity_buttons[i]
+		card.activity_type = activity_types[i]
+		card.card_tapped.connect(func(type): _on_activity_selected(i))
 
 	$ConfirmButton.pressed.connect(_on_confirm_pressed)
+
+func _apply_safe_area() -> void:
+	var safe = DisplayServer.get_display_safe_area()
+	var screen_size = DisplayServer.window_get_size()
+
+	var top_margin = safe.position.y
+	var bottom_margin = screen_size.y - (safe.position.y + safe.size.y)
+
+	# Apply safe area margins to scrollable content and bottom navigation
+	if $Activities:
+		$Activities.add_theme_constant_override("margin_top", top_margin + 8)
+	if $BottomBar:
+		$BottomBar.add_theme_constant_override("margin_bottom", bottom_margin + 8)
 
 	# Check if this is first training day for tutorial
 	_check_tutorial_needed()
@@ -48,7 +64,7 @@ func _on_training_activity_chosen(activity: int, slot: int) -> void:
 func _update_ui() -> void:
 	var racer = TrainingManager._get_current_racer()
 	if not racer:
-	    return
+		return
 
 	# Update stat bars
 	$StatsContainer/Speed.stat_name = "SPEED"
@@ -73,11 +89,11 @@ func _on_activity_selected(index: int) -> void:
 	var _slot = TrainingManager.selected_activities.size()
 
 	if TrainingManager.select_activity(activity, _slot):
-	    # Visual feedback - clear all selections first
-	    for card in activity_buttons:
-	        card.is_selected = false
-	    # Select the clicked card
-	    activity_buttons[index].is_selected = true
+		# Visual feedback - clear all selections first
+		for card in activity_buttons:
+			card.is_selected = false
+		# Select the clicked card
+		activity_buttons[index].is_selected = true
 
 func _on_confirm_pressed() -> void:
 	TrainingManager.confirm_training_day()
@@ -85,11 +101,11 @@ func _on_confirm_pressed() -> void:
 func _check_tutorial_needed() -> void:
 	# Show tutorial for first-time players
 	if SaveManager.player_data and SaveManager.player_data.current_season:
-	    var season = SaveManager.player_data.current_season
-	    # If this is week 1, day 1, show tutorial
-	    if season.current_week == 1 and season.current_day == 1:
-	        $TutorialOverlay.tutorial_active = true
-	        $TutorialOverlay.show_current_step()
-	    else:
-	        $TutorialOverlay.tutorial_active = false
-	        $TutorialOverlay.hide_tutorial()
+		var season = SaveManager.player_data.current_season
+		# If this is week 1, day 1, show tutorial
+		if season.current_week == 1 and season.current_day == 1:
+			$TutorialOverlay.tutorial_active = true
+			$TutorialOverlay.show_current_step()
+		else:
+			$TutorialOverlay.tutorial_active = false
+			$TutorialOverlay.hide_tutorial()

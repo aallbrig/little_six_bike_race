@@ -26,9 +26,9 @@ Little Six is in active development with spec-driven implementation. Core projec
 - **Spec 011** — Static Marketing Website: Bootstrap 5 site with game host, mobile responsive design
 
 ### Next Priorities
-- Spec 003 — Training System (Tamagotchi mechanics)
-- Spec 007 — Mobile UI/UX (touch controls, responsive layouts)
-- Spec 004 — Multiplayer Race (core racing mechanics)
+- Spec 013 — Dynamic Camera System (multiple camera modes and automatic switching)
+- Spec 006 — AWS Infrastructure (cloud deployment for multiplayer backend)
+- Spec 014 — Visual Polish (feedback systems and animations)
 
 ## Development
 

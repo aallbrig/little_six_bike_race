@@ -20,16 +20,16 @@ func _on_skip_timer_timeout() -> void:
 
 func _skip_to_title() -> void:
 	if not _skipped:
-	    _skipped = true
-	    $AnimationPlayer.stop()
-	    $CinematicTimer.stop()
-	    $SkipTimer.stop()
-	    GameManager.transition_to(GameManager.GameState.TITLE)
+		_skipped = true
+		$AnimationPlayer.stop()
+		$CinematicTimer.stop()
+		$SkipTimer.stop()
+		GameManager.transition_to(GameManager.GameState.TITLE)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and $UI/SkipLabel.visible:
-	    _skip_to_title()
+		_skip_to_title()
 
 func _on_cinematic_complete() -> void:
 	if not _skipped:
-	    GameManager.transition_to(GameManager.GameState.TITLE)
+		GameManager.transition_to(GameManager.GameState.TITLE)

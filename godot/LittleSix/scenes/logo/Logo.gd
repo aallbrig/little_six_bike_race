@@ -10,6 +10,6 @@ func _ready() -> void:
 	# Ensure GameManager is ready (autoloads initialize in order)
 	await get_tree().process_frame
 	if GameManager:
-	    GameManager.transition_to(GameManager.GameState.CINEMATIC)
+		GameManager.transition_to(GameManager.GameState.CINEMATIC)
 	else:
-	    push_error("GameManager not found - autoload failed to initialize")
+		push_error("GameManager not found - autoload failed to initialize")

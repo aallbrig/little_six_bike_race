@@ -45,14 +45,14 @@ func _on_sprint_exhausted(_racer_id: int) -> void:
 	sprint_energy = 0.0
 
 func _on_pit_zone_entered(_racer_id: int) -> void:
-	if _racer_id == 0:  # Local player
-	    $ExchangeZone.visible = true
-	    in_exchange_zone = true
+	if _racer_id == 0:	# Local player
+		$ExchangeZone.visible = true
+		in_exchange_zone = true
 
 func _on_pit_zone_exited(_racer_id: int) -> void:
 	if _racer_id == 0:
-	    $ExchangeZone.visible = false
-	    in_exchange_zone = false
+		$ExchangeZone.visible = false
+		in_exchange_zone = false
 
 func _on_riders_position_update(rider_positions: Array) -> void:
 	$Minimap.update_rider_positions(rider_positions)
@@ -65,18 +65,20 @@ func set_sprint_energy(energy: float) -> void:
 	sprint_energy = energy
 
 func _apply_safe_area_margins() -> void:
-	# Safe area handling disabled for now to avoid autoload issues
-	# if not SafeAreaManager.is_safe_area_supported():
-	#     return
-	#
-	# var margins = SafeAreaManager.get_safe_margins()
-	#
-	# # For landscape race HUD, adjust right margin for notch
-	# $RaceHUD.add_theme_constant_override("margin_right", margins.right + 8)
-	#
-	# # Position elements to avoid safe area
-	# if margins.right > 0:
-	#     # Move speedometer and minimap left to avoid right notch
-	#     $RaceHUD/Speedometer.position.x -= margins.right * 0.5
-	#     $RaceHUD/Minimap.position.x -= margins.right
-	pass
+	var safe = DisplayServer.get_display_safe_area()
+	var screen_size = DisplayServer.window_get_size()
+
+	# For landscape race HUD, safe area is primarily right side (notch)
+	var right_margin = screen_size.x - (safe.position.x + safe.size.x)
+
+	if right_margin > 0:
+		# Adjust right margin for notch
+		$TopBar.add_theme_constant_override("margin_right", right_margin + 8)
+
+		# Move elements left to avoid notch
+		if $Speedometer:
+			$Speedometer.position.x -= right_margin * 0.3
+		if $SprintBar:
+			$SprintBar.position.x -= right_margin * 0.6
+		if $Minimap:
+			$Minimap.position.x -= right_margin

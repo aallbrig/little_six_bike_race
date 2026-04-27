@@ -30,7 +30,7 @@ func test_connection_success_signal():
 
 	# Then: Connected signal should be emitted on successful connection
 	# This would be tested with a real WebSocket server in integration tests
-	assert_false(connected_emitted)  # Not connected yet
+	assert_false(connected_emitted)	 # Not connected yet
 
 func test_message_sending():
 	# Given: WebSocket client with mock connection

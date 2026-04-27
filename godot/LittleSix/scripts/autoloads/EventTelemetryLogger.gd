@@ -6,7 +6,7 @@ extends Node
 
 const LOG_PREFIX = "[TELEMETRY]"
 var _enabled: bool = true
-var _log_level: int = 2  # 0=None, 1=Error, 2=Info, 3=Debug
+var _log_level: int = 2	 # 0=None, 1=Error, 2=Info, 3=Debug
 var _signal_count: int = 0
 var _start_time: int = 0
 
@@ -63,15 +63,15 @@ func _log_event(signal_name: String, params: Array = []) -> void:
 	var time = (Time.get_ticks_msec() - _start_time) / 1000.0
 	var param_str = ""
 	if not params.is_empty():
-	    var param_parts = []
-	    for p in params:
-	        if p is Dictionary:
-	            param_parts.append(str(p))
-	        elif p is Object and p.has_method("to_dict"):
-	            param_parts.append(str(p.to_dict()))
-	        else:
-	            param_parts.append(str(p))
-	    param_str = "(" + ", ".join(param_parts) + ")"
+		var param_parts = []
+		for p in params:
+			if p is Dictionary:
+				param_parts.append(str(p))
+			elif p is Object and p.has_method("to_dict"):
+				param_parts.append(str(p.to_dict()))
+			else:
+				param_parts.append(str(p))
+		param_str = "(" + ", ".join(param_parts) + ")"
 
 	print_rich("[color=cyan]%s[/color] [color=yellow]%.2fs[/color] %s%s" % [LOG_PREFIX, time, signal_name, param_str])
 
@@ -116,7 +116,7 @@ func _on_race_finished(results: Array) -> void:
 func _on_steer_input_changed(value: float) -> void:
 	# Less verbose for high-frequency input
 	if _log_level >= 3:
-	    _log_event("steer_input_changed", [value])
+		_log_event("steer_input_changed", [value])
 func _on_sprint_button_pressed(pressed: bool) -> void:
 	_log_event("sprint_button_pressed", [pressed])
 func _on_brake_button_pressed(pressed: bool) -> void:
@@ -147,7 +147,7 @@ func set_log_level(level: int) -> void:
 func get_stats() -> Dictionary:
 	var uptime = (Time.get_ticks_msec() - _start_time) / 1000.0
 	return {
-	    "signals_logged": _signal_count,
-	    "uptime_seconds": uptime,
-	    "signals_per_second": _signal_count / max(1.0, uptime)
+		"signals_logged": _signal_count,
+		"uptime_seconds": uptime,
+		"signals_per_second": _signal_count / max(1.0, uptime)
 	}

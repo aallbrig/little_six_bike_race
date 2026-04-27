@@ -20,14 +20,14 @@ func _ready() -> void:
 	uniform bool reverse = false;
 
 	void fragment() {
-	    vec2 center = vec2(0.5, 0.5);
-	    vec2 uv = UV;
-	    float dist = distance(uv, center);
+		vec2 center = vec2(0.5, 0.5);
+		vec2 uv = UV;
+		float dist = distance(uv, center);
 
-	    float radius = reverse ? (1.0 - progress) : progress;
-	    float alpha = smoothstep(radius - 0.01, radius + 0.01, dist);
+		float radius = reverse ? (1.0 - progress) : progress;
+		float alpha = smoothstep(radius - 0.01, radius + 0.01, dist);
 
-	    COLOR = vec4(0.0, 0.0, 0.0, alpha);
+		COLOR = vec4(0.0, 0.0, 0.0, alpha);
 	}
 	"""
 	var material = ShaderMaterial.new()
@@ -45,7 +45,7 @@ func _ready() -> void:
 # Transition out (iris closes)
 func transition_out(callback: Callable, duration: float = 0.3) -> void:
 	if _is_transitioning:
-	    return
+		return
 	_is_transitioning = true
 	_transition_overlay.visible = true
 
@@ -60,7 +60,7 @@ func transition_out(callback: Callable, duration: float = 0.3) -> void:
 # Transition in (iris opens)
 func transition_in(duration: float = 0.3) -> void:
 	if not _transition_overlay.visible:
-	    return
+		return
 
 	var material = _transition_overlay.material as ShaderMaterial
 	material.set_shader_parameter("reverse", true)

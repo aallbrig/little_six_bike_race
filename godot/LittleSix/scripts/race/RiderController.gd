@@ -23,6 +23,9 @@ var current_speed: float = 0.0
 var draft_detector: Area3D
 var collision_controller: CollisionController
 
+# Pedal audio
+var _pedal_player: AudioStreamPlayer3D
+
 func _ready() -> void:
 	# Setup collision
 	collision_layer = 1
@@ -47,6 +50,16 @@ func _ready() -> void:
 	draft_detector.area_entered.connect(_on_draft_area_entered)
 	draft_detector.area_exited.connect(_on_draft_area_exited)
 
+	# Setup pedal audio
+	_setup_audio()
+
+func _setup_audio() -> void:
+	_pedal_player = AudioStreamPlayer3D.new()
+	_pedal_player.bus = "SFX"
+	_pedal_player.stream = load("res://assets/audio/sfx/bike_pedal.wav")
+	_pedal_player.autoplay = false
+	add_child(_pedal_player)
+
 func _physics_process(delta: float) -> void:
 	# Update bike physics state
 	bike_physics.is_pedaling = is_pedaling
@@ -62,6 +75,9 @@ func _physics_process(delta: float) -> void:
 	# Update physics
 	bike_physics.update_velocity(delta)
 	current_speed = bike_physics.velocity
+
+	# Update pedal audio
+	_update_pedal_audio(current_speed, MAX_SPEED)
 
 	# Clamp to max speed
 	current_speed = min(current_speed, MAX_SPEED)
@@ -121,3 +137,73 @@ func reset_for_new_lap() -> void:
 	is_sprinting = false
 	is_braking = false
 	bike_physics.reset()
+
+func _update_pedal_audio(current_speed: float, max_speed: float) -> void:
+	if current_speed < 0.5:
+		if _pedal_player.playing:
+			_pedal_player.stop()
+		return
+
+	if not _pedal_player.playing:
+		_pedal_player.play()
+
+	var speed_ratio = current_speed / max_speed
+	_pedal_player.pitch_scale = lerp(0.6, 1.5, speed_ratio)
+	_pedal_player.volume_db = lerp(-15.0, 0.0, speed_ratio)
+
+func _player_steering(delta: float) -> void:
+	# Basic player steering - would be replaced with input handling
+	if is_ai:
+		# Simple AI steering toward track
+		var track_direction = Vector3.FORWARD  # Simplified
+		var steer_input = 0.0
+		bike_physics.apply_steering(steer_input, delta)
+
+# Reconciliation variables
+var _reconcile_target: Vector3
+var _reconcile_time_remaining: float = 0.0
+
+# Interpolation for remote riders
+var _interp_target: Vector3
+var _interp_time: float = 0.0
+
+func start_reconcile(target: Vector3, duration: float) -> void:
+	_reconcile_target = target
+	_reconcile_time_remaining = duration
+
+func _apply_reconcile(delta: float) -> void:
+	if _reconcile_time_remaining <= 0: return
+	var t = delta / _reconcile_time_remaining
+	global_position = global_position.lerp(_reconcile_target, t)
+	_reconcile_time_remaining = max(0.0, _reconcile_time_remaining - delta)
+
+func add_interpolation_target(target: Vector3, server_time: float) -> void:
+	_interp_target = target
+	_interp_time = server_time
+	# Smooth interpolation toward target
+	var tween = create_tween()
+	tween.tween_property(self, "global_position", target, 0.1)
+
+# World state reconciliation (added for networking)
+func _on_world_state(payload: Dictionary) -> void:
+	var server_ts: float = payload["timestamp"]
+	for racer_data in payload["racers"]:
+		var racer_id = racer_data["id"]
+		var server_pos = Vector3(
+			racer_data["pos"][0],
+			racer_data["pos"][1],
+			racer_data["pos"][2]
+		)
+		var server_speed = racer_data["speed"]
+		var server_laps = racer_data["laps"]
+
+		if racer_id == NetworkMgr.local_player_id:
+			# Reconcile local rider
+			var delta_pos = (global_position - server_pos).length()
+			if delta_pos > 0.5:  # RECONCILE_THRESHOLD
+				start_reconcile(server_pos, 0.2)
+		else:
+			# For remote riders, just snap to position (simplified)
+			var remote_rider = get_node("../Rider" + str(racer_id))  # Simplified
+			if remote_rider:
+				remote_rider.global_position = server_pos

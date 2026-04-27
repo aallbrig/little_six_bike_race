@@ -1,239 +1,229 @@
 extends Node
 
-const TrainingActivity = preload("res://scripts/training/TrainingActivity.gd")
-const SaveManagerScript = preload("res://scripts/autoloads/SaveManager.gd")
+const MUSIC_CATALOG: Dictionary = {
+    "logo":          "res://assets/audio/music/logo.ogg",
+    "attract":       "res://assets/audio/music/attract.ogg",
+    "hub":           "res://assets/audio/music/hub.ogg",
+    "training":      "res://assets/audio/music/training.ogg",
+    "lobby":         "res://assets/audio/music/lobby.ogg",
+    "race_normal":   "res://assets/audio/music/race_normal.ogg",
+    "race_intense":  "res://assets/audio/music/race_intense.ogg",
+    "results_win":   "res://assets/audio/music/results_win.ogg",
+    "results_loss":  "res://assets/audio/music/results_loss.ogg",
+}
 
-const SFX_CATALOG = {
-	# Training & UI
-	"activity_selected": "res://assets/audio/sfx/ui_click.ogg",
-	"training_complete": "res://assets/audio/sfx/victory.ogg",
-	"fatigue_warning": "res://assets/audio/sfx/fatigue_warning.ogg",
-	"ui_click": "res://assets/audio/sfx/ui_click.ogg",
-	"ui_hover": "res://assets/audio/sfx/ui_hover.ogg",
+const SFX_CATALOG: Dictionary = {
+    # Bike & Racing
+    "bike_pedal_loop":   "res://assets/audio/sfx/bike_pedal.wav",
+    "bike_sprint":       "res://assets/audio/sfx/bike_sprint.wav",
+    "bike_brake":        "res://assets/audio/sfx/bike_brake.wav",
+    "burn_skid":         "res://assets/audio/sfx/burn_skid.wav",
+    "draft_whoosh":      "res://assets/audio/sfx/draft_whoosh.wav",
+    "crash_impact":      "res://assets/audio/sfx/crash_impact.wav",
+    "exchange_click":    "res://assets/audio/sfx/exchange_click.wav",
+    "bell_lap":          "res://assets/audio/sfx/bell_lap.wav",
 
-	# Race Actions
-	"pedal_stroke": "res://assets/audio/sfx/ui_click.ogg",  # Placeholder - should be cycling sound
-	"sprint_start": "res://assets/audio/sfx/sprint.ogg",
-	"sprint_end": "res://assets/audio/sfx/sprint.ogg",
-	"brake_applied": "res://assets/audio/sfx/ui_click.ogg",  # Placeholder
-	"exchange_complete": "res://assets/audio/sfx/exchange.ogg",
-	"burn_activated": "res://assets/audio/sfx/burn.ogg",
+    # Race Events
+    "race_start_horn":   "res://assets/audio/sfx/race_start_horn.wav",
+    "lap_whoosh":        "res://assets/audio/sfx/lap_whoosh.wav",
+    "position_up":       "res://assets/audio/sfx/position_up.wav",
+    "position_down":     "res://assets/audio/sfx/position_down.wav",
 
-	# Race Events
-	"bell_lap": "res://assets/audio/sfx/bell_lap.ogg",
-	"lap_complete": "res://assets/audio/sfx/victory.ogg",
-	"race_start": "res://assets/audio/sfx/bell_lap.ogg",
-	"race_finish": "res://assets/audio/sfx/victory.ogg",
-	"crowd_cheer": "res://assets/audio/sfx/victory.ogg",
+    # Training
+    "stat_increase":     "res://assets/audio/sfx/stat_up.wav",
+    "stat_decrease":     "res://assets/audio/sfx/stat_down.wav",
+    "fatigue_warning":   "res://assets/audio/sfx/fatigue_warn.wav",
+    "injury_event":      "res://assets/audio/sfx/injury.wav",
+    "event_positive":    "res://assets/audio/sfx/event_good.wav",
+    "event_negative":    "res://assets/audio/sfx/event_bad.wav",
 
-	# Feedback
-	"crash": "res://assets/audio/sfx/crash.ogg",
-	"drafting_enter": "res://assets/audio/sfx/drafting.ogg",
-	"drafting_exit": "res://assets/audio/sfx/drafting.ogg",
-	"pit_zone_enter": "res://assets/audio/sfx/pit_zone.ogg",
+    # UI
+    "button_tap":        "res://assets/audio/sfx/tap.wav",
+    "back_nav":          "res://assets/audio/sfx/back.wav",
+    "screen_appear":     "res://assets/audio/sfx/appear.wav",
+    "unlock":            "res://assets/audio/sfx/unlock.wav",
+    "notification":      "res://assets/audio/sfx/notify.wav",
+    "countdown_tick":    "res://assets/audio/sfx/tick.wav",
+    "countdown_go":      "res://assets/audio/sfx/go.wav",
+
+    # Crowd
+    "crowd_idle_loop":   "res://assets/audio/sfx/crowd_idle.wav",
+    "crowd_cheer":       "res://assets/audio/sfx/crowd_cheer.wav",
+    "crowd_gasp":        "res://assets/audio/sfx/crowd_gasp.wav",
+    "crowd_eruption":    "res://assets/audio/sfx/crowd_eruption.wav",
+    "wind_ambient_loop": "res://assets/audio/sfx/wind.wav",
 }
 
 var _music_a: AudioStreamPlayer
 var _music_b: AudioStreamPlayer
-var _ui_player: AudioStreamPlayer
-var _positional_sfx_template: AudioStreamPlayer3D
+var _active_layer: int = 0  # 0 = A, 1 = B
+var _current_track: String = ""
+var _audio_unlocked: bool = false
+var _sfx_pool: Array[AudioStreamPlayer] = []
 
-var _music_volume: float = 0.8
-var _sfx_volume: float = 1.0
+const SFX_POOL_SIZE := 8
 
 func _ready() -> void:
-	# Create audio players
-	_music_a = AudioStreamPlayer.new()
-	_music_b = AudioStreamPlayer.new()
-	_ui_player = AudioStreamPlayer.new()
-	_positional_sfx_template = AudioStreamPlayer3D.new()
+    _music_a = AudioStreamPlayer.new()
+    _music_a.bus = "Music"
+    add_child(_music_a)
 
-	add_child(_music_a)
-	add_child(_music_b)
-	add_child(_ui_player)
-	add_child(_positional_sfx_template)
+    _music_b = AudioStreamPlayer.new()
+    _music_b.bus = "Music"
+    _music_b.volume_db = -80.0
+    add_child(_music_b)
 
-	# Load audio settings
-	_load_audio_settings()
+    # Pre-allocate SFX pool
+    for i in SFX_POOL_SIZE:
+        var player = AudioStreamPlayer.new()
+        player.bus = "SFX"
+        add_child(player)
+        _sfx_pool.append(player)
 
-	# Connect to EventBus
-	EventBus.music_track_requested.connect(play_music)
-	EventBus.sfx_requested.connect(_on_sfx_requested)
-	EventBus.game_state_changed.connect(_on_game_state_changed)
-
-	# Race events
-	EventBus.race_started.connect(_on_race_started)
-	EventBus.lap_completed.connect(_on_lap_completed)
-	EventBus.race_finished.connect(_on_race_finished)
-	EventBus.sprint_button_pressed.connect(_on_sprint_button_pressed)
-	EventBus.brake_button_pressed.connect(_on_brake_button_pressed)
-	EventBus.exchange_button_tapped.connect(_on_exchange_button_tapped)
-	EventBus.bell_lap_triggered.connect(_on_bell_lap_triggered)
-
-	# Training events
-	EventBus.training_activity_chosen.connect(_on_training_activity_chosen)
-	EventBus.training_activity_resolved.connect(_on_training_activity_resolved)
-	EventBus.fatigue_threshold_crossed.connect(_on_fatigue_threshold_crossed)
+    # Connect to EventBus
+    EventBus.music_track_requested.connect(_on_music_requested)
+    EventBus.sfx_requested.connect(_on_sfx_requested)
+    EventBus.game_state_changed.connect(_on_state_changed)
+    EventBus.bell_lap_triggered.connect(_on_bell_lap)
+    EventBus.fatigue_threshold_crossed.connect(_on_fatigue_threshold)
+    EventBus.crash_occurred.connect(func(_id): play_sfx("crowd_gasp"))
+    EventBus.exchange_executed.connect(func(_t, _o, _i, is_burn):
+        play_sfx("exchange_click")
+        if is_burn: play_sfx("burn_skid")
+    )
+    EventBus.training_activity_resolved.connect(func(_act, changes):
+        for key in changes:
+            if key != "fatigue":
+                if changes[key] > 0: play_sfx("stat_increase")
+                elif changes[key] < 0: play_sfx("stat_decrease")
+    )
 
 func play_music(track_id: String, fade_time: float = 1.0) -> void:
-	var track_path = "res://assets/audio/music/" + track_id + ".ogg"
-	var stream = load(track_path)
-	if not stream:
-		# Silent fallback for missing/empty assets during development
-		print("AudioManager: Missing or invalid music file: ", track_path)
-		return
+    if track_id == _current_track: return
+    if not _audio_unlocked: return
 
-	# Check if stream is valid (not empty/corrupted)
-	if not stream is AudioStream:
-		print("AudioManager: Invalid audio stream for: ", track_path)
-		return
+    var path = MUSIC_CATALOG.get(track_id, "")
+    if path == "" or not ResourceLoader.exists(path):
+        push_warning("AudioManager: missing music track '" + track_id + "'")
+        return
 
-	# Crossfade between music layers A/B
-	var active_player = _music_a if _music_a.playing else _music_b
-	var inactive_player = _music_b if active_player == _music_a else _music_a
+    _current_track = track_id
+    var inactive = _music_b if _active_layer == 0 else _music_a
+    var active = _music_a if _active_layer == 0 else _music_b
 
-	inactive_player.stream = stream
-	inactive_player.volume_db = linear_to_db(_music_volume)
-	inactive_player.play()
+    inactive.stream = load(path)
+    inactive.volume_db = -80.0
+    inactive.play()
 
-	if active_player.playing:
-		# Simple crossfade using tween
-		var tween = create_tween()
-		tween.tween_property(active_player, "volume_db", linear_to_db(0.0), fade_time)
-		tween.tween_callback(active_player.stop)
-		tween.tween_property(inactive_player, "volume_db", linear_to_db(_music_volume), fade_time)
+    var tween = create_tween()
+    tween.set_parallel(true)
+    tween.tween_property(inactive, "volume_db", 0.0, fade_time)
+    tween.tween_property(active, "volume_db", -80.0, fade_time)
+    await tween.finished
 
-func stop_music(_fade_time: float = 0.5) -> void:
-	_music_a.stop()
-	_music_b.stop()
+    active.stop()
+    _active_layer = 1 - _active_layer
 
-func play_sfx(sfx_id: String, _bus: String = "SFX") -> void:
-	var sfx_path = SFX_CATALOG.get(sfx_id)
-	if not sfx_path:
-		print("AudioManager: SFX not found in catalog: " + sfx_id)
-		return
+func stop_music(fade_time: float = 0.5) -> void:
+    var active = _music_a if _active_layer == 0 else _music_b
+    var tween = create_tween()
+    tween.tween_property(active, "volume_db", -80.0, fade_time)
+    await tween.finished
+    active.stop()
+    _current_track = ""
 
-	var stream = load(sfx_path)
-	if not stream:
-		print("AudioManager: Could not load SFX: " + sfx_path)
-		return
+func play_sfx(sfx_id: String) -> void:
+    if not _audio_unlocked: return
+    var stream = _load_sfx(sfx_id)
+    if stream == null: return
 
-	_ui_player.stream = stream
-	_ui_player.volume_db = linear_to_db(_sfx_volume)
-	_ui_player.play()
+    # Find available pool player
+    for player in _sfx_pool:
+        if not player.playing:
+            player.bus = "SFX"
+            player.stream = stream
+            player.play()
+            return
 
-func play_sfx_at(sfx_id: String, world_position: Vector3) -> void:
-	var sfx_path = SFX_CATALOG.get(sfx_id)
-	if not sfx_path:
-		print("AudioManager: SFX not found in catalog: " + sfx_id)
-		return
+    # All pooled players busy — use oldest (interrupt it)
+    _sfx_pool[0].stream = stream
+    _sfx_pool[0].play()
 
-	var stream = load(sfx_path)
-	if not stream:
-		print("AudioManager: Could not load SFX: " + sfx_path)
-		return
+func play_sfx_at(sfx_id: String, world_pos: Vector3) -> void:
+    if not _audio_unlocked: return
+    var stream = _load_sfx(sfx_id)
+    if stream == null: return
 
-	var player = _positional_sfx_template.duplicate()
-	player.stream = stream
-	player.position = world_position
-	player.volume_db = linear_to_db(_sfx_volume)
-	add_child(player)
-	player.play()
+    var positional = AudioStreamPlayer3D.new()
+    positional.bus = "SFX"
+    positional.stream = stream
+    positional.global_position = world_pos
+    positional.max_distance = 50.0
+    positional.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_SQUARE_DISTANCE
+    get_tree().root.add_child(positional)
+    positional.play()
+    await positional.finished
+    positional.queue_free()
 
-	# Auto-remove after playing
-	player.finished.connect(func(): player.queue_free())
 
-func _load_audio_settings() -> void:
-	if SaveManager.settings_data:
-		_music_volume = SaveManager.settings_data.music_volume
-		_sfx_volume = SaveManager.settings_data.sfx_volume
-	else:
-		# Fallback to defaults
-		_music_volume = 0.8
-		_sfx_volume = 1.0
 
 func set_music_volume(linear: float) -> void:
-	_music_volume = clamp(linear, 0.0, 1.0)
-	_music_a.volume_db = linear_to_db(_music_volume)
-	_music_b.volume_db = linear_to_db(_music_volume)
-
-	# Save to settings
-	if SaveManager.settings_data:
-		SaveManager.settings_data.music_volume = _music_volume
-		SaveManager.save_game()
+    var db = linear_to_db(max(0.001, linear))
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), db)
 
 func set_sfx_volume(linear: float) -> void:
-	_sfx_volume = clamp(linear, 0.0, 1.0)
-
-	# Save to settings
-	if SaveManager.settings_data:
-		SaveManager.settings_data.sfx_volume = _sfx_volume
-		SaveManager.save_game()
+    var db = linear_to_db(max(0.001, linear))
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), db)
 
 func unlock_audio() -> void:
-	# Mobile browsers require user interaction before playing audio
-	if OS.has_feature("web"):
-		play_sfx("ui_click")  # Silent click to unlock audio
+    if _audio_unlocked: return
+    # Play a silent buffer to unlock audio context on mobile
+    var silent = AudioStreamPlayer.new()
+    silent.bus = "UI"
+    add_child(silent)
+    silent.play()
+    await get_tree().process_frame
+    silent.queue_free()
+    _audio_unlocked = true
+
+func _load_sfx(sfx_id: String) -> AudioStream:
+    var path = SFX_CATALOG.get(sfx_id, "")
+    if path == "" or not ResourceLoader.exists(path):
+        push_warning("AudioManager: missing SFX '" + sfx_id + "'")
+        return null
+    return load(path)
+
+func _on_music_requested(track_id: String, fade_time: float = 1.0) -> void:
+    play_music(track_id, fade_time)
 
 func _on_sfx_requested(sfx_id: String, position: Vector3) -> void:
-	if position == Vector3.ZERO:
-		play_sfx(sfx_id)
-	else:
-		play_sfx_at(sfx_id, position)
+    if position == Vector3.ZERO:
+        play_sfx(sfx_id)
+    else:
+        play_sfx_at(sfx_id, position)
 
-# Race event handlers
-func _on_race_started() -> void:
-	play_sfx("race_start")
 
-func _on_lap_completed(_racer_id: int, lap_number: int, _lap_time: float) -> void:
-	if lap_number == 49:  # Final lap
-		play_sfx("bell_lap")
-	else:
-		play_sfx("lap_complete")
 
-func _on_race_finished(results: Array) -> void:
-	# Check if player won
-	if results.size() > 0 and results[0].racer_id == 0:  # Assuming player is racer 0
-		play_sfx("crowd_cheer")
-	play_sfx("race_finish")
+func _on_state_changed(new_state: GameManager.GameState) -> void:
+    match new_state:
+        GameManager.GameState.LOGO:         play_music("logo", 0.5)
+        GameManager.GameState.CINEMATIC:    play_music("attract", 2.0)
+        GameManager.GameState.TITLE:        pass  # Attract continues
+        GameManager.GameState.DEMO:         play_music("race_normal", 1.0)
+        GameManager.GameState.MAIN_HUB:     play_music("hub", 1.5)
+        GameManager.GameState.TRAINING_DAY: play_music("training", 1.0)
+        GameManager.GameState.LOBBY:        play_music("lobby", 1.0)
+        GameManager.GameState.RACE_ACTIVE:  play_music("race_normal", 1.0)
 
-func _on_sprint_button_pressed(pressed: bool) -> void:
-	if pressed:
-		play_sfx("sprint_start")
-	else:
-		play_sfx("sprint_end")
+func _on_bell_lap() -> void:
+    play_sfx("bell_lap")
+    play_sfx("crowd_eruption")
+    # Hard cut, brief silence, then race_intense
+    var active = _music_a if _active_layer == 0 else _music_b
+    active.stop()
+    await get_tree().create_timer(0.1).timeout
+    play_music("race_intense", 0.0)  # No crossfade — instant
 
-func _on_brake_button_pressed(pressed: bool) -> void:
-	if pressed:
-		play_sfx("brake_applied")
-
-func _on_exchange_button_tapped() -> void:
-	play_sfx("exchange_complete")
-
-func _on_bell_lap_triggered() -> void:
-	play_sfx("bell_lap")
-
-# Training event handlers
-func _on_training_activity_chosen(_activity: TrainingActivity.Type, _slot: int) -> void:
-	play_sfx("activity_selected")
-
-func _on_training_activity_resolved(_activity: TrainingActivity.Type, _changes: Dictionary) -> void:
-	play_sfx("training_complete")
-
-func _on_fatigue_threshold_crossed(_old_level: String, new_level: String) -> void:
-	if new_level == "TIRED" or new_level == "OVERLOADED":
-		play_sfx("fatigue_warning")
-
-func _on_game_state_changed(new_state: int) -> void:
-	# Update music based on game state
-	match new_state:
-		GameManager.GameState.LOGO:
-			play_music("logo_theme")
-		GameManager.GameState.MAIN_HUB:
-			play_music("hub_theme")
-		GameManager.GameState.RACE_ACTIVE:
-			play_music("race_theme")
-		GameManager.GameState.TRAINING_DAY:
-			play_music("training_theme")
-		_:
-			pass
+func _on_fatigue_threshold(old_level: String, new_level: String) -> void:
+    if new_level == "OVERLOADED" or new_level == "DANGER ZONE":
+        play_sfx("fatigue_warning")

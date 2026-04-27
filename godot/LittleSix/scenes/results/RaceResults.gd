@@ -9,8 +9,8 @@ var results_data: Array = []
 func _ready() -> void:
 	# Get results from scene parameters
 	if get_tree().current_scene.has_meta("results"):
-	    results_data = get_tree().current_scene.get_meta("results")
-	    display_results(results_data)
+		results_data = get_tree().current_scene.get_meta("results")
+		display_results(results_data)
 
 func display_results(results: Array) -> void:
 	"""Display race results"""
@@ -21,14 +21,14 @@ func display_results(results: Array) -> void:
 
 	# Display top positions (simplified - only showing 2 for now)
 	if results.size() >= 1:
-	    var first = results[0]
-	    $Panel/VBoxContainer/ResultsContainer/Position1/NameLabel.text = "Racer " + str(first.racer_id)
-	    $Panel/VBoxContainer/ResultsContainer/Position1/TimeLabel.text = format_time(first.total_time)
+		var first = results[0]
+		$Panel/VBoxContainer/ResultsContainer/Position1/NameLabel.text = "Racer " + str(first.racer_id)
+		$Panel/VBoxContainer/ResultsContainer/Position1/TimeLabel.text = format_time(first.total_time)
 
 	if results.size() >= 2:
-	    var second = results[1]
-	    $Panel/VBoxContainer/ResultsContainer/Position2/NameLabel2.text = "Racer " + str(second.racer_id)
-	    $Panel/VBoxContainer/ResultsContainer/Position2/TimeLabel2.text = format_time(second.total_time)
+		var second = results[1]
+		$Panel/VBoxContainer/ResultsContainer/Position2/NameLabel2.text = "Racer " + str(second.racer_id)
+		$Panel/VBoxContainer/ResultsContainer/Position2/TimeLabel2.text = format_time(second.total_time)
 
 	# Update player stats (mock data for now)
 	update_player_stats()

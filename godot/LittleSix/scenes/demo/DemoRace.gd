@@ -11,10 +11,10 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_demo_timer += delta
 	if _demo_timer >= DEMO_DURATION:
-	    GameManager.transition_to(GameManager.GameState.CINEMATIC)
+		GameManager.transition_to(GameManager.GameState.CINEMATIC)
 
 func _on_tap_to_play_pressed() -> void:
 	if SaveManager.player_data == null:
-	    GameManager.transition_to(GameManager.GameState.CREATE_RACER)
+		GameManager.transition_to(GameManager.GameState.CREATE_RACER)
 	else:
-	    GameManager.transition_to(GameManager.GameState.MAIN_HUB)
+		GameManager.transition_to(GameManager.GameState.MAIN_HUB)

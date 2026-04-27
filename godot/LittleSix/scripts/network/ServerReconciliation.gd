@@ -9,12 +9,12 @@ signal desync_detected(desync_data: Dictionary)
 
 const RECONCILIATION_BUFFER_SIZE = 30
 const MAX_DESYNC_DISTANCE = 10.0  # Meters
-const RECONCILIATION_TIMEOUT = 5.0  # Seconds
+const RECONCILIATION_TIMEOUT = 5.0	# Seconds
 
 var _reconciliation_buffer: Array[Dictionary] = []
 var _last_reconciliation_time: float = 0.0
 var _desync_count: int = 0
-var _rider_controllers: Dictionary = {}  # racer_id -> RiderController
+var _rider_controllers: Dictionary = {}	 # racer_id -> RiderController
 
 func _ready() -> void:
 	NetworkMgr.race_synchronized.connect(_on_server_update)
