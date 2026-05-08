@@ -1,0 +1,38 @@
+version: '3'
+
+tasks:
+  lint:
+    cmds:
+      - task: lint-gdscript
+      - task: lint-js
+      - task: lint-shell
+
+  lint-gdscript:
+    cmds:
+      - which gdlint 2>/dev/null && gdlint $(find . -name "*.gd" -not -path "*/addons/*") || echo "gdlint not available, skipping"
+
+  lint-js:
+    cmds:
+      - |
+        files="$(find web -type f \( -name '*.js' -o -name '*.ts' \) 2>/dev/null)"
+        if [ -z "$files" ]; then
+          echo "No JavaScript/TypeScript files found"
+        elif ! which eslint >/dev/null 2>&1; then
+          echo "eslint not available, skipping"
+        elif [ -z "$(find . -maxdepth 3 \( -name '.eslintrc*' -o -name 'eslint.config.*' \) -print -quit)" ]; then
+          echo "eslint not configured, skipping"
+        else
+          eslint $files
+        fi
+
+  lint-shell:
+    cmds:
+      - |
+        files="$(find scripts -type f -name '*.sh' 2>/dev/null)"
+        if [ -z "$files" ]; then
+          echo "No shell scripts found"
+        elif which shellcheck >/dev/null 2>&1; then
+          shellcheck $files
+        else
+          echo "shellcheck not available, skipping"
+        fi
